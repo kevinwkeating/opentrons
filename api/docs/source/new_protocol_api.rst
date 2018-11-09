@@ -36,6 +36,8 @@ Robot and Pipette
 .. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
    :members:
 
+.. autoclass:: opentrons.protocol_api.transfers.TransferOptions
+   :members:
 
 .. _protocol-api-labware:
 
