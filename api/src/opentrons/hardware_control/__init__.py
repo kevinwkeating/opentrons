@@ -45,6 +45,10 @@ class MustHomeError(RuntimeError):
     pass
 
 
+class NoTipAttachedError(RuntimeError):
+    pass
+
+
 _Backend = Union[Controller, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
@@ -245,6 +249,7 @@ class API(HardwareAPILike):
             instr_dict = instr.as_dict()
             for key in configs:
                 instruments[mount][key] = instr_dict[key]
+            instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
     @property

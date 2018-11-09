@@ -6,6 +6,7 @@ from .labware import Well, Labware, load, load_module, ModuleGeometry
 from opentrons import types, hardware_control as hc
 import opentrons.config.robot_configs as rc
 from opentrons.hardware_control import adapters, modules
+from opentrons.helpers import helpers
 from . import geometry
 
 
@@ -401,32 +402,140 @@ class InstrumentContext:
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
-            location: Well = None,
+            location: Union[Well, types.Location] = None,
             rate: float = 1.0) -> 'InstrumentContext':
-        raise NotImplementedError
+        """
+        Mix a volume of liquid (uL) using this pipette.
+        If no location is specified, the pipette will mix from its current
+        position. If no Volume is passed, 'mix' will default to its max_volume
 
-    def blow_out(self, location: Well = None) -> 'InstrumentContext':
+        :param repetitions: how many times the pipette should mix (default: 1)
+        :param volume: number of microlitres to mix (default: self.max_volume)
+        :param location: a Well or a position relative to well
+        e.g, `plate.wells('A1').bottom()` (types.Location type)
+        :param rate: Set plunger speed for this mix, where
+        speed = rate * (aspirate_speed or dispense_speed)
+        """
+        self._log.debug(
+            'mixing {}uL with {} repetitions in {} at rate={}'.format(
+                volume, repetitions,
+                location if location else 'current position', rate))
+        self.aspirate(volume, location, rate)
+        for i in range(repetitions -1):
+            self.dispense(volume, rate=rate)
+            self.aspirate(volume, rate=rate)
+        self.dispense(volume, rate=rate)
+        return self
+
+    def blow_out(self,
+                 location: Union[Well,
+                 types.Location] = None) -> 'InstrumentContext':
         """
         Blow liquid out of the tip.
 
         If called without arguments, blow out into the
         :py:attr:`trash_container`.
         """
-        raise NotImplementedError
+        if isinstance(location, Well):
+            point, well = location.bottom()
+            target = types.Location(point + types.Point(0, 0,
+                                                   self.well_bottom_clearance),
+                               well)
+        elif isinstance(location, types.Location):
+            target = location
+        elif location is None:
+            target = self.trash_container.wells()[0]
+        else:
+            raise TypeError(
+                'location should be a Well or Location, but it is {}'
+                .format(location))
+        self.move_to(target)
+        self._hardware.blow_out(self._mount)
+        return self
 
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> 'InstrumentContext':
-        raise NotImplementedError
+        """
+        Touch the Pipette tip to the sides of a well, with the intent of
+        removing left-over droplets
+        :param location: a Well. If no location is passed, pipette will
+        touch_tip at current location
+        :param radius: Radius is a floating point describing the percentage of
+        a well's radius. When radius=1.0, :any:`touch_tip()` will move to
+        100% of the well's radius.
+        When radius=0.5, :any:`touch_tip()` will move to 50% of the well's
+        radius. Default: 1.0 (100%)
+        :param v_offset: The offset in mm from the top of the well to touch tip
+        Default: -1.0 mm
+        :param speed: The speed for touch tip motion, in mm/s.
+        Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+        """
+        if not self.hw_pipette['has_tip']:
+            raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
+
+        if speed > 80.0:
+            self._log.warning('Touch tip speed above limit. Setting to 80mm/s')
+            speed = 80.0
+        elif speed < 20.0:
+            self._log.warning('Touch tip speed below min. Setting to 20mm/s')
+            speed = 20.0
+
+        if helpers.is_number(location):
+            # Deprecated syntax
+            self._log.warning("Please use the `v_offset` named parameter")
+            v_offset = location
+            location = None
+
+        if location is None and self._ctx.location_cache:
+            location = self._ctx.location_cache.labware
+        if isinstance(location, Well):
+            self.move_to(location.top())
+        else:
+            raise TypeError(
+                'location should be a Well, but it is {}'.format(location))
+
+        v_offset = types.Point(0, 0, v_offset)
+        well_edges = [
+            location._from_center_cartesian(x=radius, y=0, z=1),    #right edge
+            location._from_center_cartesian(x=-radius, y=0, z=1),   #left edge
+            location._from_center_cartesian(x=0, y=radius, z=1),    #back edge
+            location._from_center_cartesian(x=0, y=-radius, z=1)    #front edge
+        ]
+        # Apply vertical offset to well edges
+        well_edges = map(lambda  x: x + v_offset, well_edges)
+        for edge in well_edges:
+            self._hardware.move_to(self._mount, edge, speed)
+        return self
 
     def air_gap(self,
                 volume: float = None,
                 height: float = None) -> 'InstrumentContext':
-        raise NotImplementedError
+        """
+        Pull air into the Pipette current tip.
+        :param volume: The amount in uL to aspirate air into the tube.
+        (Default will use all remaining volume in tip)
+        :param height: The number of millimiters to move above the current Well
+        to air-gap aspirate
+        (Default will be 5mm above current Well)
+        """
+        if height is None:
+            height = 5
+        loc = self._ctx.location_cache.labware
+        if isinstance(loc, Well):
+            target = loc.top(height)
+        else:
+            raise RuntimeError('No previous Well cached to perform air gap')
+        self._hardware.move_to(target.point)
+        self._hardware.aspirate(volume)
+        return self
 
     def return_tip(self) -> 'InstrumentContext':
+        if not self.hw_pipette['has_tip']:
+            self._log.warning('Pipette has no tip to return')
+        # TODO: how do we track last picked up tip?
         raise NotImplementedError
 
     def pick_up_tip(self, location: types.Location = None,
@@ -540,22 +649,247 @@ class InstrumentContext:
     def distribute(self,
                    volume: float,
                    source: Well,
-                   dest: Well,
+                   dest: List[Well],
                    *args, **kwargs) -> 'InstrumentContext':
+        """
+        Move a volume of liquid from one source to multiple destinations.
+        Refer to transfer() for accepted kwargs
+        """
+        self._log.debug("Distributing {} from {} to {}"
+                        .format(volume, source, dest))
         raise NotImplementedError
 
     def consolidate(self,
                     volume: float,
-                    source: Well,
+                    source: List[Well],
                     dest: Well,
+
                     *args, **kwargs) -> 'InstrumentContext':
+        """
+        Move liquid from multiple wells (sources) to a single well(destination)
+        Refer to transfer() for accepted kwargs
+        """
+        self._log.debug("Consolidate {} from {} to {}"
+                        .format(volume, source, dest))
         raise NotImplementedError
 
     def transfer(self,
-                 volume: float,
-                 source: Well,
-                 dest: Well,
+                 volume: Union[float, Tuple[float], List[float]],
+                 source: Union[Well, List[Well]],
+                 dest: Union[Well, List[Well]],
                  **kwargs) -> 'InstrumentContext':
+        """
+        Transfer will move a volume of liquid from a source location(s)
+        to a dest location(s). It is a higher-level command, incorporating
+        other :any:`Pipette` commands, like :any:`aspirate` and
+        :any:`dispense`, designed to make protocol writing easier at the
+        cost of specificity.
+
+
+        :param volume: The amount of volume to remove from each `sources`
+        :any:`Placeable` and add to each `targets` :any:`Placeable`.
+        If `volume` is a list, each volume will be used for the sources/targets
+        at the matching index. If `volumes` is a tuple with two elements,
+        like `(20, 100)`, then a list of volumes will be generated with
+        a linear gradient between the two volumes in the tuple.
+
+        :param source: Single :any:`Well` or list of :any:`Wells`s, from where
+        liquid will be :any:`aspirate`ed.
+
+        :param dest: Single :any:`Well` or list of :any:`Well`s, where
+        liquid will be :any:`dispense`ed to.
+
+        :param kwargs:
+
+        new_tip : string
+            'never': no tips will be picked up or dropped during the transfer
+            'once': (default) a single tip will be used for all commands
+            'always': use a new tip for each transfer
+
+        trash : boolean
+            If `False` (default behavior) tips will be returned to their
+            tip rack. If `True` and a trash container has been attached
+            to this `Pipette`, then the tip will be sent to the trash
+            container.
+
+        touch_tip : boolean
+            If `True`, a :any:`touch_tip` will occur following each
+            :any:`aspirate` and :any:`dispense`. If set to `False` (default),
+            no :any:`touch_tip` will occur.
+
+        rate: float
+            aspirate/dispense flow rate
+
+        blow_out : boolean
+            If `True`, a :any:`blow_out` will occur following each
+            :any:`dispense`, but only if the pipette has no liquid left in it.
+            If set to `False` (default), no :any:`blow_out` will occur.
+
+        mix_before : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will proceed each :any:`aspirate` during the transfer and dispense.
+            The tuple's values is interpreted as (repetitions, volume).
+
+        mix_after : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will follow each :any:`dispense` during the transfer or
+            consolidate. The tuple's values is interpreted as
+            (repetitions, volume).
+
+        carryover : boolean
+            If `True` (default), any `volumes` that exceed the maximum volume
+            of this `Pipette` will be split into multiple smaller volumes.
+
+        repeat : boolean
+            (Only applicable to :any:`distribute` and :any:`consolidate`)If
+            `True` (default), sequential :any:`aspirate` volumes will be
+            combined into one tip for the purpose of saving time. If `False`,
+            all volumes will be transferred seperately.
+
+        gradient : lambda
+            Function for calculating the curve used for gradient volumes.
+            When `volumes` is a tuple of length 2, its values are used
+            to create a list of gradient volumes. The default curve for
+            this gradient is linear (lambda x: x), however a method can
+            be passed with the `gradient` keyword argument to create a
+            custom curve.
+        """
+        self._log.debug("Transfer {} from {} to {}"
+                        .format(volume, source, dest))
+        tip_options = {
+            'once': 1,
+            'never': 0,
+            'always': float('inf')
+        }
+
+        # TODO: implement mode in distribute/ consolidate instead
+        kwargs['mode'] = kwargs.get('mode', 'transfer')
+        kwargs['touch_tip'] = kwargs.get('touch_tip', False)
+        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
+        kwargs['air_gap'] = kwargs.get('air_gap', 0)
+        kwargs['carryover'] = kwargs.get('carryover', True)
+        kwargs['rate'] = kwargs.get('rate', 1)
+        kwargs['mix_before'] = kwargs.get('mix_before', (0, 0))
+        kwargs['mix_after'] = kwargs.get('mix_after', (0,0))
+
+        tips = tip_options[kwargs['new_tip']]
+        if tips is None:
+            raise ValueError('Unknown "new_tip" option: {}'.
+                             format(kwargs['new_tip']))
+
+        plan = self._create_tranfer_plan(volume, source, dest, **kwargs)
+        raise NotImplementedError
+
+    def _create_tranfer_plan(self, vol, src, dest, **kwargs):
+        """
+        Transfer plan is a list of dicts consisting of 'aspirate' and
+        'dispense' locations and volumes in the following way:
+        [{'aspirate': {'location': <source1>, 'volume': <float(volume1)>},
+          'dispense': {'location': <target1>, 'volume': <float(volume1)}>},
+         {....},
+         {....},
+         {'aspirate': {'location': <sourceN>, 'volume': <float(volumeN)>},
+          'dispense': {'location': <targetN>, 'volume': <float(volumeN)>}},...]
+
+        The plan accounts for pipette volume limits by dividing volumes that
+        exceed max_volume into smaller amounts.
+        The plan tries to achieve the requested transfer in the minimum number
+        of steps by combining several aspirates (in case of distribute) or
+        dispenses (in case of consolidate)
+        """
+        xfer_plan = []
+        # CASES:
+        # i. if using multi-channel pipette,
+        # and the source or target is a row/column of Wells (i.e list of Wells)
+        # then avoid iterating through its Wells.
+        # ii. if using single channel pipettes, flatten a multi-dimensional
+        # list of Wells into a 1 dimensional list of Wells
+        if self.hw_pipette['channels'] > 1:
+            src, dest = self._multichannel_transfer(src, dest)
+        else:
+            if isinstance(src, List) and isinstance(src[0], List):
+                # Source is a List[List[Well]]
+                # TODO: Check if this is a valid arg
+                src = [well for series in src for well in series]
+            if isinstance(dest, List) and isinstance(dest[0], List):
+                # Dest is a List[List[Well]]
+                # TODO: Check if this is a valid arg
+                dest = [well for series in dest for well in series]
+
+        # Create a list of sources and targets of equal length
+        # So, if src = [S1, S2] & dest = [D1, D2, D3, D4],
+        # s = [S1, S1, S2, S2] & d = [D1, D2, D3, D4]
+        s, t = helpers._create_source_target_lists(src, dest, **kwargs)
+
+        total_xfers = len(t)
+        # Create a list of volumes to be used per transfer: either a volume
+        # gradient or the user-specified list or a list of constant vol
+        # for each transfer
+        v = helpers._create_volume_list(vol, total_xfers, **kwargs)
+
+        for i in range(total_xfers):
+            xfer_plan.append({
+                'aspirate': {'location': s[i], 'volume': v[i]},
+                'dispense': {'location': t[i], 'volume': v[i]}
+            })
+
+        max_vol = self.max_volume - kwargs['air_gap']
+
+        if kwargs['carryover']:
+            xfer_plan = helpers._expand_for_carryover(max_vol,
+                                                      xfer_plan, **kwargs)
+        if kwargs['mode'] == 'distribute':
+            # combine target volumes into single aspirate
+            xfer_plan = helpers._compress_for_distribute(max_vol,
+                                                         xfer_plan, **kwargs)
+        elif kwargs['mode'] == 'consolidate':
+            # combine target volumes into multiple aspirates
+            xfer_plan = helpers._compress_for_consolidate(max_vol,
+                                                          xfer_plan, **kwargs)
+        return xfer_plan
+
+    def _run_transfer_plan(self, tips, plan, **kwargs):
+        air_gap = kwargs['air_gap']
+        touch_tip = kwargs['touch_tip']
+
+        total_xfers = len(plan)
+        for i, step in enumerate(plan):
+            aspirate = step.get('aspirate')
+            dispense = step.get('dispense')
+
+            if aspirate:
+                self._add_tip_during_transfer(tips)
+                if self.current_volume == 0:
+                    self._mix_during_transfer(kwargs['mix_before'],
+                                              aspirate['location'], **kwargs)
+                self.aspirate(aspirate['volume'],
+                              aspirate['location'], rate=kwargs['rate'])
+                if air_gap:
+                    self.air_gap(air_gap)
+
+    def _add_tip_during_transfer(self, tips):
+        """
+        Performs a :any:`pick_up_tip` when running a :any:`transfer`,
+        :any:`distribute`, or :any:`consolidate`.
+        """
+        # 'tips' is reduced after drop_tip()
+        if tips > 0:
+            try:
+                self.pick_up_tip()
+            except:
+                raise
+
+    def _mix_during_transfer(self, mix: tuple[int, int], loc: Well, **kwargs):
+        raise NotImplementedError
+
+    def _multichannel_transfer(self, s, d):
+        # Helper function for multi-channel use-case
+        assert isinstance(s, Well) or \
+               (isinstance(s, List) and not isinstance(s[0], List)),\
+               'Source should be a Well or List[Well] but is {}'.format(s)
+        assert isinstance(d, Well) or \
+            (isinstance(d, List) and not isinstance(d[0], List)),\
+            'Target should be a Well or List[Well] but is {}'.format(d)
         raise NotImplementedError
 
     def move_to(self, location: types.Location) -> 'InstrumentContext':
