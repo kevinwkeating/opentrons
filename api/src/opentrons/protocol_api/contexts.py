@@ -48,6 +48,7 @@ class ProtocolContext:
         self._location_cache: Optional[types.Location] = None
         self._hardware = self._build_hardware_adapter(self._loop)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
+        self._trash_container
 
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
@@ -294,6 +295,7 @@ class InstrumentContext:
             assert tip_rack.is_tiprack
 
         self._last_location: Union[Labware, Well, None] = None
+        self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
         self._well_bottom_clearance = 0.5
@@ -402,7 +404,7 @@ class InstrumentContext:
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
-            location: Union[Well, types.Location] = None,
+            location: Well = None,
             rate: float = 1.0) -> 'InstrumentContext':
         """
         Mix a volume of liquid (uL) using this pipette.
@@ -420,34 +422,35 @@ class InstrumentContext:
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
                 volume, repetitions,
                 location if location else 'current position', rate))
+        if not self.hw_pipette['has_tip']:
+            raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
+
         self.aspirate(volume, location, rate)
-        for i in range(repetitions -1):
+        for i in range(repetitions - 1):
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
         return self
 
     def blow_out(self,
-                 location: Union[Well,
-                 types.Location] = None) -> 'InstrumentContext':
+                 location: Union[Well, types.Location] = None
+                 ) -> 'InstrumentContext':
         """
         Blow liquid out of the tip.
 
         If called without arguments, blow out into the
         :py:attr:`trash_container`.
         """
+        if location is None:
+            location = self._ctx.location_cache.labware
         if isinstance(location, Well):
-            point, well = location.bottom()
-            target = types.Location(point + types.Point(0, 0,
-                                                   self.well_bottom_clearance),
-                               well)
-        elif isinstance(location, types.Location):
-            target = location
-        elif location is None:
-            target = self.trash_container.wells()[0]
+            if location.parent.is_tiprack:
+                self._log.warning('Blow_out being performed on a tiprack. '
+                                  'Please re-check your code')
+            target = location.top()
         else:
             raise TypeError(
-                'location should be a Well or Location, but it is {}'
+                'location should be a Well or None, but it is {}'
                 .format(location))
         self.move_to(target)
         self._hardware.blow_out(self._mount)
@@ -462,7 +465,9 @@ class InstrumentContext:
         Touch the Pipette tip to the sides of a well, with the intent of
         removing left-over droplets
         :param location: a Well. If no location is passed, pipette will
-        touch_tip at current location
+        touch_tip at current Well's edges at top(-1)
+        NOTE: This is behavior change from legacy API (which accepts any
+        'placeable' as location
         :param radius: Radius is a floating point describing the percentage of
         a well's radius. When radius=1.0, :any:`touch_tip()` will move to
         100% of the well's radius.
@@ -483,31 +488,41 @@ class InstrumentContext:
             self._log.warning('Touch tip speed below min. Setting to 20mm/s')
             speed = 20.0
 
-        if helpers.is_number(location):
-            # Deprecated syntax
-            self._log.warning("Please use the `v_offset` named parameter")
-            v_offset = location
-            location = None
+        # if helpers.is_number(location):
+        #     # Deprecated syntax
+        #     self._log.warning("Please use the `v_offset` named parameter")
+        #     v_offset = location
+        #     location = None
 
         if location is None and self._ctx.location_cache:
             location = self._ctx.location_cache.labware
         if isinstance(location, Well):
+            if location.parent.is_tiprack:
+                self._log.warning('Touch_tip being performed on a tiprack. '
+                                  'Please re-check your code')
             self.move_to(location.top())
         else:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
-        v_offset = types.Point(0, 0, v_offset)
+        offset_point = types.Point(0, 0, v_offset)
         well_edges = [
-            location._from_center_cartesian(x=radius, y=0, z=1),    #right edge
-            location._from_center_cartesian(x=-radius, y=0, z=1),   #left edge
-            location._from_center_cartesian(x=0, y=radius, z=1),    #back edge
-            location._from_center_cartesian(x=0, y=-radius, z=1)    #front edge
+            # right edge
+            location._from_center_cartesian(x=radius, y=0, z=1),
+            # left edge
+            location._from_center_cartesian(x=-radius, y=0, z=1),
+            # back edge
+            location._from_center_cartesian(x=0, y=radius, z=1),
+            # front edge
+            location._from_center_cartesian(x=0, y=-radius, z=1)
         ]
         # Apply vertical offset to well edges
-        well_edges = map(lambda  x: x + v_offset, well_edges)
-        for edge in well_edges:
-            self._hardware.move_to(self._mount, edge, speed)
+        well_edges = list(map(lambda x: x + offset_point, well_edges))
+        try:
+            for edge in well_edges:
+                self._hardware.move_to(self._mount, edge, speed)
+        except Exception:
+            raise
         return self
 
     def air_gap(self,
@@ -521,22 +536,29 @@ class InstrumentContext:
         to air-gap aspirate
         (Default will be 5mm above current Well)
         """
+        if not self.hw_pipette['has_tip']:
+            raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
+
         if height is None:
             height = 5
-        loc = self._ctx.location_cache.labware
-        if isinstance(loc, Well):
-            target = loc.top(height)
-        else:
+        loc = self._ctx.location_cache
+        if not loc or not isinstance(loc.labware, Well):
             raise RuntimeError('No previous Well cached to perform air gap')
-        self._hardware.move_to(target.point)
-        self._hardware.aspirate(volume)
+        target = loc.labware.top(height)
+        self.move_to(target)
+        self.aspirate(volume)
         return self
 
     def return_tip(self) -> 'InstrumentContext':
         if not self.hw_pipette['has_tip']:
             self._log.warning('Pipette has no tip to return')
-        # TODO: how do we track last picked up tip?
-        raise NotImplementedError
+        loc = self._last_tip_picked_up_from
+        if not isinstance(loc, Well):
+            raise TypeError('Last tip location should be a Well but it is: '
+                            '{}'.format(loc))
+        point, well = loc.bottom()
+        self.drop_tip(types.Location(point, well))
+        return self
 
     def pick_up_tip(self, location: types.Location = None,
                     presses: int = 3,
@@ -598,7 +620,7 @@ class InstrumentContext:
         # Note that the hardware API pick_up_tip action includes homing z after
 
         tiprack.use_tips(target, num_channels)
-
+        self._last_tip_picked_up_from = target
         return self
 
     def drop_tip(self, location: types.Location = None) -> 'InstrumentContext':
@@ -628,6 +650,7 @@ class InstrumentContext:
 
         self.move_to(target.top())
         self._hardware.drop_tip(self._mount)
+        self._last_tip_picked_up_from = None
         return self
 
     def home(self) -> 'InstrumentContext':
@@ -657,7 +680,9 @@ class InstrumentContext:
         """
         self._log.debug("Distributing {} from {} to {}"
                         .format(volume, source, dest))
-        raise NotImplementedError
+        kwargs['mode'] = 'distribute'
+        kwargs['disposal_vol'] = kwargs.get('disposal_volume', self.min_volume)
+        return self.transfer(volume, source, dest, **kwargs)
 
     def consolidate(self,
                     volume: float,
@@ -671,7 +696,9 @@ class InstrumentContext:
         """
         self._log.debug("Consolidate {} from {} to {}"
                         .format(volume, source, dest))
-        raise NotImplementedError
+        kwargs['mode'] = 'consolidate'
+        kwargs['disposal_vol'] = kwargs.get('disposal_volume', 0)
+        return self.transfer(volume, source, dest, **kwargs)
 
     def transfer(self,
                  volume: Union[float, Tuple[float], List[float]],
@@ -764,13 +791,13 @@ class InstrumentContext:
 
         # TODO: implement mode in distribute/ consolidate instead
         kwargs['mode'] = kwargs.get('mode', 'transfer')
-        kwargs['touch_tip'] = kwargs.get('touch_tip', False)
         kwargs['new_tip'] = kwargs.get('new_tip', 'once')
-        kwargs['air_gap'] = kwargs.get('air_gap', 0)
         kwargs['carryover'] = kwargs.get('carryover', True)
         kwargs['rate'] = kwargs.get('rate', 1)
-        kwargs['mix_before'] = kwargs.get('mix_before', (0, 0))
-        kwargs['mix_after'] = kwargs.get('mix_after', (0,0))
+        # kwargs['mix_before'] = kwargs.get('mix_before', (0, 0))
+        # kwargs['mix_after'] = kwargs.get('mix_after', (0,0))
+        # kwargs['air_gap'] = kwargs.get('air_gap', 0)
+        # kwargs['touch_tip'] = kwargs.get('touch_tip', False)
 
         tips = tip_options[kwargs['new_tip']]
         if tips is None:
@@ -778,9 +805,14 @@ class InstrumentContext:
                              format(kwargs['new_tip']))
 
         plan = self._create_tranfer_plan(volume, source, dest, **kwargs)
-        raise NotImplementedError
+        self._run_transfer_plan(tips, plan, **kwargs)
+        return self
 
-    def _create_tranfer_plan(self, vol, src, dest, **kwargs):
+    def _create_tranfer_plan(self,
+                             vol: Union[float, Tuple[float], List[float]] = 0,
+                             src: Union[Well, List[Well]] = None,
+                             dest: Union[Well, List[Well]] = None,
+                             **kwargs):
         """
         Transfer plan is a list of dicts consisting of 'aspirate' and
         'dispense' locations and volumes in the following way:
@@ -848,9 +880,9 @@ class InstrumentContext:
                                                           xfer_plan, **kwargs)
         return xfer_plan
 
-    def _run_transfer_plan(self, tips, plan, **kwargs):
+    def _run_transfer_plan(self, tips: float, plan: List, **kwargs):
         air_gap = kwargs['air_gap']
-        touch_tip = kwargs['touch_tip']
+        rate = kwargs['rate']
 
         total_xfers = len(plan)
         for i, step in enumerate(plan):
@@ -858,27 +890,32 @@ class InstrumentContext:
             dispense = step.get('dispense')
 
             if aspirate:
+                loc = aspirate['location']
+                asp_vol = aspirate['volume']
                 self._add_tip_during_transfer(tips)
-                if self.current_volume == 0:
-                    self._mix_during_transfer(kwargs['mix_before'],
-                                              aspirate['location'],
-                                              **kwargs)
-                self.aspirate(aspirate['volume'],
-                              aspirate['location'], rate=kwargs['rate'])
+                self.aspirate(loc, asp_vol, rate=rate)
                 air_gap and self.air_gap(air_gap)
-                touch_tip or touch_tip == 0 and self.touch_tip(touch_tip)
 
             if dispense:
-                air_gap and self.air_gap(air_gap)
-                self.dispense(dispense['volume'], dispense['location'],
-                              rate=kwargs['rate'])
-                self._mix_during_transfer(kwargs['mix_after'],
-                                          dispense['location'], **kwargs)
+                loc = dispense['location']
+                disp_vol = dispense['volume']
+                if air_gap and plan[i-1].get('aspirate'):
+                    # If air_gap is true and this is the first step after
+                    # aspirate, then dispense that air gap
+                    if isinstance(loc, Well):
+                        self.dispense(air_gap, loc.top(5), rate=rate)
+                    elif isinstance(loc, types.Location):
+                        _loc = types.Location(loc.point + types.Point(0, 0, 5),
+                                              loc.labware)
+                        self.dispense(air_gap, _loc, rate=rate)
+                self.dispense(disp_vol, loc, rate=rate)
+                if step is plan[-1] or plan[i+1].get('aspirate'):
+                    # If there's an aspirate following this step or
+                    # if this is the last step in transfer, check for drop tip
+                    tips = self._drop_tip_during_transfer(tips, i, total_xfers,
+                                                          **kwargs)
 
-    def _blowout_during_transfer(self, loc, **kwargs):
-        raise NotImplementedError
-
-    def _add_tip_during_transfer(self, tips):
+    def _add_tip_during_transfer(self, tips: float):
         """
         Performs a :any:`pick_up_tip` when running a :any:`transfer`,
         :any:`distribute`, or :any:`consolidate`.
@@ -887,10 +924,24 @@ class InstrumentContext:
         if tips > 0:
             try:
                 self.pick_up_tip()
-            except:
+            except Exception:
                 raise
 
-    def _mix_during_transfer(self, mix: tuple[int, int], loc: Well, **kwargs):
+    def _drop_tip_during_transfer(self, tips: float, step_no: int,
+                                  total: int, **kwargs):
+        trash = kwargs.get('trash', True)
+        if tips > 1 or (step_no + 1 == total and tips > 0):
+            if trash and self.trash_container:
+                self.drop_tip()
+            else:
+                self.return_tip()
+            tips -= 1
+        return tips
+
+    def _mix_during_transfer(self, mix: Tuple[int, int], loc: Well, **kwargs):
+        raise NotImplementedError
+
+    def _blowout_during_transfer(self, loc, **kwargs):
         raise NotImplementedError
 
     def _multichannel_transfer(self, s, d):
@@ -1027,6 +1078,7 @@ class InstrumentContext:
 
     @trash_container.setter
     def trash_container(self, trash: Labware):
+
         raise NotImplementedError
 
     @property
@@ -1035,6 +1087,10 @@ class InstrumentContext:
         The model string for the pipette.
         """
         return self.hw_pipette['name']
+
+    @property
+    def min_volume(self) ->float:
+        return self.hw_pipette['min_volume']
 
     @property
     def max_volume(self) -> float:
