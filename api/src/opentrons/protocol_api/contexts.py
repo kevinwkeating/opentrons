@@ -861,11 +861,22 @@ class InstrumentContext:
                 self._add_tip_during_transfer(tips)
                 if self.current_volume == 0:
                     self._mix_during_transfer(kwargs['mix_before'],
-                                              aspirate['location'], **kwargs)
+                                              aspirate['location'],
+                                              **kwargs)
                 self.aspirate(aspirate['volume'],
                               aspirate['location'], rate=kwargs['rate'])
-                if air_gap:
-                    self.air_gap(air_gap)
+                air_gap and self.air_gap(air_gap)
+                touch_tip or touch_tip == 0 and self.touch_tip(touch_tip)
+
+            if dispense:
+                air_gap and self.air_gap(air_gap)
+                self.dispense(dispense['volume'], dispense['location'],
+                              rate=kwargs['rate'])
+                self._mix_during_transfer(kwargs['mix_after'],
+                                          dispense['location'], **kwargs)
+
+    def _blowout_during_transfer(self, loc, **kwargs):
+        raise NotImplementedError
 
     def _add_tip_during_transfer(self, tips):
         """
