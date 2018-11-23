@@ -422,6 +422,7 @@ def test_blow_out(loop, monkeypatch):
 
     move_location = None
     instr.pick_up_tip()
+    instr.aspirate(10, lw.wells()[0])
 
     def fake_move(loc):
         nonlocal move_location
@@ -429,13 +430,24 @@ def test_blow_out(loop, monkeypatch):
 
     monkeypatch.setattr(instr, 'move_to', fake_move)
     instr.blow_out()
-    assert move_location ==
-    assert move_location == Location(well.bottom().point + Point(0, 0, z),
-                                     well)
+    assert move_location == lw.wells()[0].top()
 
 
+def test_return_tip(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    lw = ctx.load_labware_by_name('Opentrons_24_tuberack_1.5_mL_Eppendorf', 1)
+    tiprack = ctx.load_labware_by_name('Opentrons_96_tiprack_300_uL', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+    instr.pick_up_tip()
+    instr.move_to(lw.wells()[1].top())
+    move_location = None
 
+    def fake_move(loc):
+        nonlocal move_location
+        move_location = loc
 
-
-
-
+    monkeypatch.setattr(instr, 'move_to', fake_move)
+    instr.return_tip()
+    assert move_location == tiprack.wells()[0].bottom()

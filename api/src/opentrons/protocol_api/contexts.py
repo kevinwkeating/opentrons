@@ -48,7 +48,6 @@ class ProtocolContext:
         self._location_cache: Optional[types.Location] = None
         self._hardware = self._build_hardware_adapter(self._loop)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
-        self._trash_container
 
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
@@ -433,7 +432,7 @@ class InstrumentContext:
         return self
 
     def blow_out(self,
-                 location: Union[Well, types.Location] = None
+                 location: Well = None
                  ) -> 'InstrumentContext':
         """
         Blow liquid out of the tip.
@@ -441,7 +440,7 @@ class InstrumentContext:
         If called without arguments, blow out into the
         :py:attr:`trash_container`.
         """
-        if location is None:
+        if location is None and self._ctx.location_cache:
             location = self._ctx.location_cache.labware
         if isinstance(location, Well):
             if location.parent.is_tiprack:
@@ -494,6 +493,7 @@ class InstrumentContext:
         #     v_offset = location
         #     location = None
 
+        # If location is a valid well, move to the well first
         if location is None and self._ctx.location_cache:
             location = self._ctx.location_cache.labware
         if isinstance(location, Well):
@@ -505,6 +505,7 @@ class InstrumentContext:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
+        # Determine the touch_tip edges/points
         offset_point = types.Point(0, 0, v_offset)
         well_edges = [
             # right edge
@@ -556,8 +557,7 @@ class InstrumentContext:
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        point, well = loc.bottom()
-        self.drop_tip(types.Location(point, well))
+        self.drop_tip(loc.top())
         return self
 
     def pick_up_tip(self, location: types.Location = None,
@@ -702,9 +702,17 @@ class InstrumentContext:
 
     def transfer(self,
                  volume: Union[float, Tuple[float], List[float]],
-                 source: Union[Well, List[Well]],
-                 dest: Union[Well, List[Well]],
+                 source,
+                 dest,
                  **kwargs) -> 'InstrumentContext':
+        # source: Union[Well, List[Well], List[List[Well]]],
+        # dest: Union[Well, List[Well], List[List[Well]]],
+        # TODO: Reach consensus on kwargs
+        # TODO: Decide if to use a disposal_volume
+        # TODO: Accordingly decide if remaining liquid should be blown out to
+        # TODO: ..trash or the original well.
+        # TODO: What should happen if the user passes a non-first-row well
+        # TODO: ..as src/dest *while using multichannel pipette?
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
@@ -739,29 +747,8 @@ class InstrumentContext:
             to this `Pipette`, then the tip will be sent to the trash
             container.
 
-        touch_tip : boolean
-            If `True`, a :any:`touch_tip` will occur following each
-            :any:`aspirate` and :any:`dispense`. If set to `False` (default),
-            no :any:`touch_tip` will occur.
-
         rate: float
             aspirate/dispense flow rate
-
-        blow_out : boolean
-            If `True`, a :any:`blow_out` will occur following each
-            :any:`dispense`, but only if the pipette has no liquid left in it.
-            If set to `False` (default), no :any:`blow_out` will occur.
-
-        mix_before : tuple
-            Specify the number of repetitions volume to mix, and a :any:`mix`
-            will proceed each :any:`aspirate` during the transfer and dispense.
-            The tuple's values is interpreted as (repetitions, volume).
-
-        mix_after : tuple
-            Specify the number of repetitions volume to mix, and a :any:`mix`
-            will follow each :any:`dispense` during the transfer or
-            consolidate. The tuple's values is interpreted as
-            (repetitions, volume).
 
         carryover : boolean
             If `True` (default), any `volumes` that exceed the maximum volume
@@ -789,14 +776,14 @@ class InstrumentContext:
             'always': float('inf')
         }
 
-        # TODO: implement mode in distribute/ consolidate instead
         kwargs['mode'] = kwargs.get('mode', 'transfer')
         kwargs['new_tip'] = kwargs.get('new_tip', 'once')
         kwargs['carryover'] = kwargs.get('carryover', True)
         kwargs['rate'] = kwargs.get('rate', 1)
+        kwargs['air_gap'] = kwargs.get('air_gap', 0)
+
         # kwargs['mix_before'] = kwargs.get('mix_before', (0, 0))
         # kwargs['mix_after'] = kwargs.get('mix_after', (0,0))
-        # kwargs['air_gap'] = kwargs.get('air_gap', 0)
         # kwargs['touch_tip'] = kwargs.get('touch_tip', False)
 
         tips = tip_options[kwargs['new_tip']]
@@ -809,9 +796,9 @@ class InstrumentContext:
         return self
 
     def _create_tranfer_plan(self,
-                             vol: Union[float, Tuple[float], List[float]] = 0,
-                             src: Union[Well, List[Well]] = None,
-                             dest: Union[Well, List[Well]] = None,
+                             vol: Union[float, Tuple[float], List[float]],
+                             src,
+                             dest,
                              **kwargs):
         """
         Transfer plan is a list of dicts consisting of 'aspirate' and
@@ -841,12 +828,10 @@ class InstrumentContext:
         else:
             if isinstance(src, List) and isinstance(src[0], List):
                 # Source is a List[List[Well]]
-                # TODO: Check if this is a valid arg
-                src = [well for series in src for well in series]
+                src = [well for well_list in src for well in well_list]
             if isinstance(dest, List) and isinstance(dest[0], List):
                 # Dest is a List[List[Well]]
-                # TODO: Check if this is a valid arg
-                dest = [well for series in dest for well in series]
+                dest = [well for well_list in dest for well in well_list]
 
         # Create a list of sources and targets of equal length
         # So, if src = [S1, S2] & dest = [D1, D2, D3, D4],
@@ -893,7 +878,7 @@ class InstrumentContext:
                 loc = aspirate['location']
                 asp_vol = aspirate['volume']
                 self._add_tip_during_transfer(tips)
-                self.aspirate(loc, asp_vol, rate=rate)
+                self.aspirate(asp_vol, loc, rate=rate)
                 air_gap and self.air_gap(air_gap)
 
             if dispense:
@@ -911,7 +896,10 @@ class InstrumentContext:
                 self.dispense(disp_vol, loc, rate=rate)
                 if step is plan[-1] or plan[i+1].get('aspirate'):
                     # If there's an aspirate following this step or
-                    # if this is the last step in transfer, check for drop tip
+                    # if this is the last step in transfer, blow out remainder
+                    # liquid and check for drop tip
+                    # TODO: Figure out where to blow out the disposal volume
+                    self._blowout_during_transfer()
                     tips = self._drop_tip_during_transfer(tips, i, total_xfers,
                                                           **kwargs)
 
@@ -941,18 +929,44 @@ class InstrumentContext:
     def _mix_during_transfer(self, mix: Tuple[int, int], loc: Well, **kwargs):
         raise NotImplementedError
 
-    def _blowout_during_transfer(self, loc, **kwargs):
+    def _blowout_during_transfer(self, loc=None, **kwargs):
         raise NotImplementedError
 
     def _multichannel_transfer(self, s, d):
+        # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
         assert isinstance(s, Well) or \
-               (isinstance(s, List) and not isinstance(s[0], List)),\
+               (isinstance(s, List) and isinstance(s[0], Well)) or \
+               (isinstance(s, List) and isinstance(s[0], List)),\
                'Source should be a Well or List[Well] but is {}'.format(s)
         assert isinstance(d, Well) or \
-            (isinstance(d, List) and not isinstance(d[0], List)),\
+            (isinstance(d, List) and isinstance(d[0], Well)) or \
+            (isinstance(d, List) and isinstance(d[0], List)), \
             'Target should be a Well or List[Well] but is {}'.format(d)
-        raise NotImplementedError
+
+        # TODO: Account for cases where a src/dest list has a non-first-row
+        # TODO: ..well (eg, 'B1') and would expect the robot/pipette to
+        # TODO: ..understand that it is referring to the whole first column
+        if isinstance(s, List) and isinstance(s[0], List):
+            # s is a List[List]]; flatten to 1D list
+            s = [well for list_elem in s for well in list_elem]
+        for well in s:
+            if not self._is_first_row(well):
+                # For now, just remove wells that aren't in first row
+                s.remove(well)
+
+        if isinstance(d, List) and isinstance(d[0], List):
+            # s is a List[List]]; flatten to 1D list
+            d = [well for list_elem in d for well in list_elem]
+        for well in d:
+            if not self._is_first_row(well):
+                # For now, just remove wells that aren't in first row
+                d.remove(well)
+
+        return s, d
+
+    def _is_first_row(self, well: Well):
+        return True if 'A' in str(well) else False
 
     def move_to(self, location: types.Location) -> 'InstrumentContext':
         """ Move the instrument.
