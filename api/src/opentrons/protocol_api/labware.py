@@ -28,6 +28,12 @@ persistent_path = os.path.join(env.get_path('APP_DATA_DIR'), 'offsets')
 
 
 class Well:
+    """
+    The Well class represents a  single well in a :py:class:`Labware`
+
+    It provides functions to return positions used in operations on the well
+    such as :py:meth:`top`, :py:meth:`bottom`
+    """
     def __init__(self, well_props: dict,
                  parent: Location,
                  display_name: str,

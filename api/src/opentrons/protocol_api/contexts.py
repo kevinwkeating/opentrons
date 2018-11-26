@@ -416,6 +416,10 @@ class InstrumentContext:
         e.g, `plate.wells('A1').bottom()` (types.Location type)
         :param rate: Set plunger speed for this mix, where
         speed = rate * (aspirate_speed or dispense_speed)
+
+        :raises NoTipAttachedError: If no tip is attached to the pipette
+
+        :returns: This instance
         """
         self._log.debug(
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
@@ -437,11 +441,29 @@ class InstrumentContext:
         """
         Blow liquid out of the tip.
 
-        If called without arguments, blow out into the
-        :py:attr:`trash_container`.
+        If :py:attr:`dispense` is used to completely empty a pipette,
+        usually a small amount of liquid will remain in the tip. This
+        method moves the plunger past its usual stops to fully remove
+        any remaining liquid from the tip. Regardless of how much liquid
+        was in the tip when this function is called, after it is done
+        the tip will be empty.
+
+        :param location: The location to blow out into. If not specified,
+                         defaults to the current location of the pipette
+        :type location: :py:class:`.Well` or None
+
+        :raises RuntimeError: If no location is specified and location cache is
+                              None. This should happen if `blow_out` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+        :returns: This instance
         """
-        if location is None and self._ctx.location_cache:
-            location = self._ctx.location_cache.labware
+        if location is None:
+            if not self._ctx.location_cache:
+                raise RuntimeError('No valid current location cache present')
+            else:
+                location = self._ctx.location_cache.labware
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning('Blow_out being performed on a tiprack. '
@@ -461,21 +483,41 @@ class InstrumentContext:
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> 'InstrumentContext':
         """
-        Touch the Pipette tip to the sides of a well, with the intent of
+        Touch the pipette tip to the sides of a well, with the intent of
         removing left-over droplets
-        :param location: a Well. If no location is passed, pipette will
-        touch_tip at current Well's edges at top(-1)
-        NOTE: This is behavior change from legacy API (which accepts any
-        'placeable' as location
-        :param radius: Radius is a floating point describing the percentage of
-        a well's radius. When radius=1.0, :any:`touch_tip()` will move to
-        100% of the well's radius.
-        When radius=0.5, :any:`touch_tip()` will move to 50% of the well's
-        radius. Default: 1.0 (100%)
+
+        :param location: If no location is passed, pipette will
+                         touch tip at current well's edges
+                        .. NOTE:: This is behavior change from legacy API
+                                  (which accepts any :py:class:`.Placeable`
+                                  as location)
+        :type location: :py:class:`.Well` or None
+
+        :param radius: Describes the proportion of the target well's
+                       radius. When `radius=1.0`, the pipette tip will move to
+                       the edge of the target well; when `radius=0.5`, it will
+                       move to 50% of the well's radius. Default: 1.0 (100%)
+        :type radius: float
+
         :param v_offset: The offset in mm from the top of the well to touch tip
-        Default: -1.0 mm
+                         A positive offset moves the tip higher above the well,
+                         while a negative offset moves it lower into the well
+                         Default: -1.0 mm
+        :type v_offset: float
+
         :param speed: The speed for touch tip motion, in mm/s.
-        Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+                      Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+        :type speed: float
+
+        :raises NoTipAttachedError: if no tip is attached to the pipette
+
+        :raises RuntimeError: If no location is specified and location cache is
+                              None. This should happen if `touch_tip` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+
+        :returns: This instance
         """
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
@@ -494,8 +536,12 @@ class InstrumentContext:
         #     location = None
 
         # If location is a valid well, move to the well first
-        if location is None and self._ctx.location_cache:
-            location = self._ctx.location_cache.labware
+        if location is None:
+            if not self._ctx.location_cache:
+                raise RuntimeError('No valid current location cache present')
+            else:
+                location = self._ctx.location_cache.labware
+
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
@@ -530,12 +576,25 @@ class InstrumentContext:
                 volume: float = None,
                 height: float = None) -> 'InstrumentContext':
         """
-        Pull air into the Pipette current tip.
+        Pull air into the pipette current tip at the current location
+
         :param volume: The amount in uL to aspirate air into the tube.
-        (Default will use all remaining volume in tip)
+                       (Default will use all remaining volume in tip)
+        :type volume: float
+
         :param height: The number of millimiters to move above the current Well
-        to air-gap aspirate
-        (Default will be 5mm above current Well)
+                       to air-gap aspirate. (Default: 5mm above current Well)
+        :type height: float
+
+        :raises NoTipAttachedError: If no tip is attached to the pipette
+
+        :raises RuntimeError: If location cache is None.
+                              This should happen if `touch_tip` is called
+                              without first calling a method that takes a
+                              location (eg, :py:meth:`.aspirate`,
+                              :py:meth:`dispense`)
+
+        :returns: This instance
         """
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
@@ -551,6 +610,12 @@ class InstrumentContext:
         return self
 
     def return_tip(self) -> 'InstrumentContext':
+        """
+        Return the currently attached tip to the location in tiprack that it
+        was picked up from
+
+        :returns: This instance
+        """
         if not self.hw_pipette['has_tip']:
             self._log.warning('Pipette has no tip to return')
         loc = self._last_tip_picked_up_from
