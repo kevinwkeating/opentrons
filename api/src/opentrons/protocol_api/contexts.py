@@ -463,7 +463,9 @@ class InstrumentContext:
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._ctx.location_cache.labware
+                location = self._ctx.location_cache.labware  # type: ignore
+                # type checked below
+
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning('Blow_out being performed on a tiprack. '
@@ -540,7 +542,8 @@ class InstrumentContext:
             if not self._ctx.location_cache:
                 raise RuntimeError('No valid current location cache present')
             else:
-                location = self._ctx.location_cache.labware
+                location = self._ctx.location_cache.labware  # type: ignore
+                # type checked below
 
         if isinstance(location, Well):
             if location.parent.is_tiprack:
@@ -552,24 +555,19 @@ class InstrumentContext:
                 'location should be a Well, but it is {}'.format(location))
 
         # Determine the touch_tip edges/points
-        offset_point = types.Point(0, 0, v_offset)
+        offset_pt = types.Point(0, 0, v_offset)
         well_edges = [
             # right edge
-            location._from_center_cartesian(x=radius, y=0, z=1),
+            location._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
             # left edge
-            location._from_center_cartesian(x=-radius, y=0, z=1),
+            location._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
             # back edge
-            location._from_center_cartesian(x=0, y=radius, z=1),
+            location._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
             # front edge
-            location._from_center_cartesian(x=0, y=-radius, z=1)
+            location._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
         ]
-        # Apply vertical offset to well edges
-        well_edges = list(map(lambda x: x + offset_point, well_edges))
-        try:
-            for edge in well_edges:
-                self._hardware.move_to(self._mount, edge, speed)
-        except Exception:
-            raise
+        for edge in well_edges:
+            self._hardware.move_to(self._mount, edge, speed)
         return self
 
     def air_gap(self,

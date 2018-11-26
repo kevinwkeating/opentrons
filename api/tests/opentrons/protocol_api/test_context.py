@@ -340,6 +340,7 @@ def test_magdeck_labware_props(loop):
     mod.engage(height=2)
     assert mod._module._driver.plate_height == 2
 
+
 def test_mix(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
