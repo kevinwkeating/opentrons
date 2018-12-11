@@ -82,7 +82,7 @@ export function createLabwareLiquidState<T> (labwareType: string, contents: T): 
 export const p300Single = {
   id: 'p300SingleId',
   mount: 'right',
-  model: 'p300_single_v1',
+  model: 'p300_single',
   tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 1,
@@ -91,7 +91,7 @@ export const p300Single = {
 export const p300Multi = {
   id: 'p300MultiId',
   mount: 'left',
-  model: 'p300_multi_v1',
+  model: 'p300_multi',
   tiprackModel: 'opentrons-tiprack-300ul',
   maxVolume: 300,
   channels: 8,
