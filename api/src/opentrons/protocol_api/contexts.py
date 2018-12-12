@@ -1,14 +1,13 @@
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 
 from .labware import Well, Labware, load, load_module, ModuleGeometry
 from opentrons import types, hardware_control as hc
 import opentrons.config.robot_configs as rc
 from opentrons.hardware_control import adapters, modules
-from opentrons.helpers import helpers
 from . import geometry
-
+from . import transfers
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -436,7 +435,7 @@ class InstrumentContext:
         return self
 
     def blow_out(self,
-                 location: Well = None
+                 location: Union[types.Location, Well] = None
                  ) -> 'InstrumentContext':
         """
         Blow liquid out of the tip.
@@ -471,6 +470,11 @@ class InstrumentContext:
                 self._log.warning('Blow_out being performed on a tiprack. '
                                   'Please re-check your code')
             target = location.top()
+        elif isinstance(location, types.Location) and not \
+                isinstance(location.labware, Well):
+            raise TypeError(
+                'location should be a Well or None, but it is {}'
+                .format(location))
         else:
             raise TypeError(
                 'location should be a Well or None, but it is {}'
@@ -751,7 +755,6 @@ class InstrumentContext:
                     volume: float,
                     source: List[Well],
                     dest: Well,
-
                     *args, **kwargs) -> 'InstrumentContext':
         """
         Move liquid from multiple wells (sources) to a single well(destination)
@@ -764,7 +767,7 @@ class InstrumentContext:
         return self.transfer(volume, source, dest, **kwargs)
 
     def transfer(self,
-                 volume: Union[float, Tuple[float], List[float]],
+                 volume: Union[float, Sequence[float]],
                  source,
                  dest,
                  **kwargs) -> 'InstrumentContext':
@@ -817,11 +820,30 @@ class InstrumentContext:
             If `True` (default), any `volumes` that exceed the maximum volume
             of this `Pipette` will be split into multiple smaller volumes.
 
-        repeat : boolean
-            (Only applicable to :any:`distribute` and :any:`consolidate`)If
-            `True` (default), sequential :any:`aspirate` volumes will be
-            combined into one tip for the purpose of saving time. If `False`,
-            all volumes will be transferred seperately.
+        touch_tip : boolean
+            If `True`, a :any:`touch_tip` will occur following each
+            :any:`aspirate` and :any:`dispense`. If set to `False` (default),
+            no :any:`touch_tip` will occur.
+
+        blow_out : boolean
+            If `True`, a :any:`blow_out` will occur following each
+            :any:`dispense`, but only if the pipette has no liquid left in it.
+            If set to `False` (default), no :any:`blow_out` will occur.
+
+        mix_before : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will proceed each :any:`aspirate` during the transfer and dispense.
+            The tuple's values is interpreted as (repetitions, volume).
+
+        mix_after : tuple
+            Specify the number of repetitions volume to mix, and a :any:`mix`
+            will following each :any:`dispense` during the transfer or
+            consolidate. The tuple's values is interpreted as
+            (repetitions, volume).
+
+        carryover : boolean
+            If `True` (default), any `volumes` that exceed the maximum volume
+            of this `Pipette` will be split into multiple smaller volumes.
 
         gradient : lambda
             Function for calculating the curve used for gradient volumes.
@@ -831,205 +853,89 @@ class InstrumentContext:
             be passed with the `gradient` keyword argument to create a
             custom curve.
         """
-        self._log.debug("Transfer {} from {} to {}"
-                        .format(volume, source, dest))
-        tip_options = {
-            'once': 1,
-            'never': 0,
-            'always': float('inf')
-        }
+        self._log.debug("Transfer {} from {} to {}".format(
+            volume, source, dest))
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
-        kwargs['new_tip'] = kwargs.get('new_tip', 'once')
-        kwargs['carryover'] = kwargs.get('carryover', True)
-        kwargs['rate'] = kwargs.get('rate', 1)
-        kwargs['air_gap'] = kwargs.get('air_gap', 0)
+        transfer_args = transfers.Transfer()
+        new_tip = None
+        if 'new_tip' in kwargs:
+            new_tip = types.TransferTipPolicy[kwargs['new_tip'].upper()]
+            if new_tip is None:
+                raise ValueError('Unknown "new_tip" option: {}'.
+                                 format(kwargs['new_tip']))
+            transfer_args = transfer_args._replace(
+                new_tip=new_tip)
 
-        # kwargs['mix_before'] = kwargs.get('mix_before', (0, 0))
-        # kwargs['mix_after'] = kwargs.get('mix_after', (0,0))
-        # kwargs['touch_tip'] = kwargs.get('touch_tip', False)
+        if 'air_gap' in kwargs:
+            transfer_args = transfer_args._replace(
+                air_gap=kwargs['air_gap'])
 
-        tips = tip_options[kwargs['new_tip']]
-        if tips is None:
-            raise ValueError('Unknown "new_tip" option: {}'.
-                             format(kwargs['new_tip']))
+        if 'carryover' in kwargs:
+            transfer_args = transfer_args._replace(
+                carryover=kwargs['carryover'])
 
-        plan = self._create_tranfer_plan(volume, source, dest, **kwargs)
-        self._run_transfer_plan(tips, plan, **kwargs)
-        return self
+        if kwargs.get('blow_out'):
+            blow_out = transfers.BlowOutStrategy.TRASH
+            transfer_args = transfer_args._replace(
+                blow_out_strategy=blow_out)
 
-    def _create_tranfer_plan(self,
-                             vol: Union[float, Tuple[float], List[float]],
-                             src,
-                             dest,
-                             **kwargs):
-        """
-        Transfer plan is a list of dicts consisting of 'aspirate' and
-        'dispense' locations and volumes in the following way:
-        [{'aspirate': {'location': <source1>, 'volume': <float(volume1)>},
-          'dispense': {'location': <target1>, 'volume': <float(volume1)}>},
-         {....},
-         {....},
-         {'aspirate': {'location': <sourceN>, 'volume': <float(volumeN)>},
-          'dispense': {'location': <targetN>, 'volume': <float(volumeN)>}},...]
+        if kwargs.get('touch_tip'):
+            touch_tip = transfers.TouchTipStrategy.ALWAYS
+            transfer_args = transfer_args._replace(
+                touch_tip_strategy=touch_tip)
 
-        The plan accounts for pipette volume limits by dividing volumes that
-        exceed max_volume into smaller amounts.
-        The plan tries to achieve the requested transfer in the minimum number
-        of steps by combining several aspirates (in case of distribute) or
-        dispenses (in case of consolidate)
-        """
-        xfer_plan = []
-        # CASES:
-        # i. if using multi-channel pipette,
-        # and the source or target is a row/column of Wells (i.e list of Wells)
-        # then avoid iterating through its Wells.
-        # ii. if using single channel pipettes, flatten a multi-dimensional
-        # list of Wells into a 1 dimensional list of Wells
-        if self.hw_pipette['channels'] > 1:
-            src, dest = self._multichannel_transfer(src, dest)
+        if 'gradient_function' in kwargs:
+            transfer_args = transfer_args._replace(
+                gradient_function=kwargs['gradient_function'])
+
+        if 'disposal_vol' in kwargs:
+            transfer_args = transfer_args._replace(
+                disposal_volume=kwargs['disposal_vol'])
+
+        mix_opts = transfers.Mix()
+        if 'mix_before' in kwargs and 'mix_after' in kwargs:
+            mix_strategy = transfers.MixStrategy.BOTH
+            before_opts = kwargs['mix_before']
+            after_opts = kwargs['mix_after']
+            mix_opts = mix_opts._replace(
+                mix_after=mix_opts.mix_after._replace(
+                    repetitions=after_opts[0], volume=after_opts[1]),
+                mix_before=mix_opts.mix_before._replace(
+                    repetitions=before_opts[0], volume=before_opts[1]))
+        elif 'mix_before' in kwargs:
+            mix_strategy = transfers.MixStrategy.BEFORE
+            before_opts = kwargs['mix_before']
+            mix_opts = mix_opts._replace(
+                mix_before=mix_opts.mix_before._replace(
+                    repetitions=before_opts[0], volume=before_opts[1]))
+        elif 'mix_after' in kwargs:
+            mix_strategy = transfers.MixStrategy.AFTER
+            after_opts = kwargs['mix_after']
+            mix_opts = mix_opts._replace(
+                mix_after=mix_opts.mix_after._replace(
+                    repetitions=after_opts[0], volume=after_opts[1]))
         else:
-            if isinstance(src, List) and isinstance(src[0], List):
-                # Source is a List[List[Well]]
-                src = [well for well_list in src for well in well_list]
-            if isinstance(dest, List) and isinstance(dest[0], List):
-                # Dest is a List[List[Well]]
-                dest = [well for well_list in dest for well in well_list]
+            mix_strategy = transfers.MixStrategy.NEVER
 
-        # Create a list of sources and targets of equal length
-        # So, if src = [S1, S2] & dest = [D1, D2, D3, D4],
-        # s = [S1, S1, S2, S2] & d = [D1, D2, D3, D4]
-        s, t = helpers._create_source_target_lists(src, dest, **kwargs)
+        if kwargs.get('trash'):
+            drop_tip = transfers.DropTipStrategy.TRASH
+        else:
+            drop_tip = transfers.DropTipStrategy.RETURN
 
-        total_xfers = len(t)
-        # Create a list of volumes to be used per transfer: either a volume
-        # gradient or the user-specified list or a list of constant vol
-        # for each transfer
-        v = helpers._create_volume_list(vol, total_xfers, **kwargs)
+        transfer_args = transfer_args._replace(
+            mix_strategy=mix_strategy, drop_tip_strategy=drop_tip)
 
-        for i in range(total_xfers):
-            xfer_plan.append({
-                'aspirate': {'location': s[i], 'volume': v[i]},
-                'dispense': {'location': t[i], 'volume': v[i]}
-            })
-
-        max_vol = self.max_volume - kwargs['air_gap']
-
-        if kwargs['carryover']:
-            xfer_plan = helpers._expand_for_carryover(max_vol,
-                                                      xfer_plan, **kwargs)
-        if kwargs['mode'] == 'distribute':
-            # combine target volumes into single aspirate
-            xfer_plan = helpers._compress_for_distribute(max_vol,
-                                                         xfer_plan, **kwargs)
-        elif kwargs['mode'] == 'consolidate':
-            # combine target volumes into multiple aspirates
-            xfer_plan = helpers._compress_for_consolidate(max_vol,
-                                                          xfer_plan, **kwargs)
-        return xfer_plan
-
-    def _run_transfer_plan(self, tips: float, plan: List, **kwargs):
-        air_gap = kwargs['air_gap']
-        rate = kwargs['rate']
-
-        total_xfers = len(plan)
-        for i, step in enumerate(plan):
-            aspirate = step.get('aspirate')
-            dispense = step.get('dispense')
-
-            if aspirate:
-                loc = aspirate['location']
-                asp_vol = aspirate['volume']
-                self._add_tip_during_transfer(tips)
-                self.aspirate(asp_vol, loc, rate=rate)
-                air_gap and self.air_gap(air_gap)
-
-            if dispense:
-                loc = dispense['location']
-                disp_vol = dispense['volume']
-                if air_gap and plan[i-1].get('aspirate'):
-                    # If air_gap is true and this is the first step after
-                    # aspirate, then dispense that air gap
-                    if isinstance(loc, Well):
-                        self.dispense(air_gap, loc.top(5), rate=rate)
-                    elif isinstance(loc, types.Location):
-                        _loc = types.Location(loc.point + types.Point(0, 0, 5),
-                                              loc.labware)
-                        self.dispense(air_gap, _loc, rate=rate)
-                self.dispense(disp_vol, loc, rate=rate)
-                if step is plan[-1] or plan[i+1].get('aspirate'):
-                    # If there's an aspirate following this step or
-                    # if this is the last step in transfer, blow out remainder
-                    # liquid and check for drop tip
-                    # TODO: Figure out where to blow out the disposal volume
-                    self._blowout_during_transfer()
-                    tips = self._drop_tip_during_transfer(tips, i, total_xfers,
-                                                          **kwargs)
-
-    def _add_tip_during_transfer(self, tips: float):
-        """
-        Performs a :any:`pick_up_tip` when running a :any:`transfer`,
-        :any:`distribute`, or :any:`consolidate`.
-        """
-        # 'tips' is reduced after drop_tip()
-        if tips > 0:
-            try:
-                self.pick_up_tip()
-            except Exception:
-                raise
-
-    def _drop_tip_during_transfer(self, tips: float, step_no: int,
-                                  total: int, **kwargs):
-        trash = kwargs.get('trash', True)
-        if tips > 1 or (step_no + 1 == total and tips > 0):
-            if trash and self.trash_container:
-                self.drop_tip()
+        transfer_options = transfers.TransferOptions(transfer=transfer_args,
+                                                     mix=mix_opts)
+        plan = transfers.TransferPlan(volume, source, dest, self,
+                                      kwargs['mode'], transfer_options)
+        for cmd in plan:
+            if isinstance(cmd['params'], dict):
+                getattr(self, cmd['method'])(**cmd['params'])
             else:
-                self.return_tip()
-            tips -= 1
-        return tips
-
-    def _mix_during_transfer(self, mix: Tuple[int, int], loc: Well, **kwargs):
-        raise NotImplementedError
-
-    def _blowout_during_transfer(self, loc=None, **kwargs):
-        raise NotImplementedError
-
-    def _multichannel_transfer(self, s, d):
-        # TODO: add a check for container being multi-channel compatible?
-        # Helper function for multi-channel use-case
-        assert isinstance(s, Well) or \
-               (isinstance(s, List) and isinstance(s[0], Well)) or \
-               (isinstance(s, List) and isinstance(s[0], List)),\
-               'Source should be a Well or List[Well] but is {}'.format(s)
-        assert isinstance(d, Well) or \
-            (isinstance(d, List) and isinstance(d[0], Well)) or \
-            (isinstance(d, List) and isinstance(d[0], List)), \
-            'Target should be a Well or List[Well] but is {}'.format(d)
-
-        # TODO: Account for cases where a src/dest list has a non-first-row
-        # TODO: ..well (eg, 'B1') and would expect the robot/pipette to
-        # TODO: ..understand that it is referring to the whole first column
-        if isinstance(s, List) and isinstance(s[0], List):
-            # s is a List[List]]; flatten to 1D list
-            s = [well for list_elem in s for well in list_elem]
-        for well in s:
-            if not self._is_first_row(well):
-                # For now, just remove wells that aren't in first row
-                s.remove(well)
-
-        if isinstance(d, List) and isinstance(d[0], List):
-            # s is a List[List]]; flatten to 1D list
-            d = [well for list_elem in d for well in list_elem]
-        for well in d:
-            if not self._is_first_row(well):
-                # For now, just remove wells that aren't in first row
-                d.remove(well)
-
-        return s, d
-
-    def _is_first_row(self, well: Well):
-        return True if 'A' in str(well) else False
+                getattr(self, cmd['method'])(*cmd['params'])
+        return self
 
     def move_to(self, location: types.Location) -> 'InstrumentContext':
         """ Move the instrument.
