@@ -1,0 +1,512 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Hardware Modules &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Advanced Control" href="robot.html" />
+ 
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+  app_id: 'ukpodv2l'
+};
+</script>
+<script>
+(function () {
+  var w = window;
+  var ic = w.Intercom;
+  if (typeof ic === "function") {
+    ic('reattach_activator');
+    ic('update', intercomSettings);
+  } else {
+    var d = document;
+    var i = function() {
+      i.c(arguments)
+    };
+    i.q = [];
+    i.c = function(args) {
+      i.q.push(args)
+    };
+    w.Intercom = i;
+
+    function l () {
+      var s = d.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+      var x = d.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+    if (w.attachEvent) {
+        w.attachEvent('onload', l);
+    } else {
+        w.addEventListener('load', l, false);
+    }
+  }
+})()
+</script>
+<script>
+  function toggleNav () {
+    document.getElementById('main-menu').classList.toggle('open');
+  }
+</script>
+
+  </head>
+  <body role="document">
+
+<header id="nav">
+  <nav class="main-menu" id="main-menu" class="">
+    <a href="#" class="brand"><img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+
+    <div id="nav-collapse" onclick="toggleNav()">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </div>
+
+    <ul >
+      <li>
+        <a href="#" class="top-level">
+         Products
+        </a>
+        <ul>
+          <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+          <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+          <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+          <li><a href="https://opentrons.com/modules" >Modules</a></li>
+          <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+          <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+        </ul>
+
+      </li>
+      <li>
+        <a href="#">
+          Company
+        </a>
+        <ul>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">We're Hiring</a></li>
+          <li><a href="https://opentrons.com/about" >About</a></li>
+          <li><a href="https://opentrons.com/team" >Team</a></li>
+          <li><a href="https://blog.opentrons.com/">Blog</a></li>
+          <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          Resources
+        </a>
+        <ul>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="https://shop.opentrons.com/" class="buy">
+          Buy
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <div class="section" id="hardware-modules">
+<span id="modules"></span><h1>Hardware Modules<a class="headerlink" href="#hardware-modules" title="Permalink to this headline">¶</a></h1>
+<p>This documentation and modules API is subject to change. Check here or on
+our github for updated information.</p>
+<p>This code is only valid on software version 3.3.0 or later.</p>
+<div class="section" id="loading-your-module-onto-a-deck">
+<h2>Loading your Module onto a deck<a class="headerlink" href="#loading-your-module-onto-a-deck" title="Permalink to this headline">¶</a></h2>
+<p>Just like labware, you will also need to load in your module in order to use it
+within a protocol. To do this, you call:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;Module Name&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Above, <cite>Module Name</cite> represents either <cite>tempdeck</cite> or <cite>magdeck</cite>.</p>
+<p>To add a labware onto a given module, you will need to use the <cite>share=True</cite> call-out</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">labware</span>
+
+<span class="n">labware</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where slot is the same slot in which you loaded your module.</p>
+</div>
+<div class="section" id="detecting-your-module-on-the-robot">
+<h2>Detecting your Module on the robot<a class="headerlink" href="#detecting-your-module-on-the-robot" title="Permalink to this headline">¶</a></h2>
+<p>The Run App auto-detects and connects to modules that are plugged into the robot upon robot connection.
+If you plug in a module with the app open and connected to your robot already, you can simply navigate to the
+<cite>Pipettes &amp; Modules</cite> in the Run App and hit the <cite>refresh</cite> icon.</p>
+<p>If you are running a program outside of the app, you will need to initiate robot connection to the module. This can
+be done like the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">robot</span>
+
+<span class="n">robot</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">robot</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+        <span class="n">module</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+<span class="n">robot</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">discover_and_connect</span><span class="p">()</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;Module Name&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="o">...</span> <span class="n">etc</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="checking-the-status-of-your-module">
+<h2>Checking the status of your Module<a class="headerlink" href="#checking-the-status-of-your-module" title="Permalink to this headline">¶</a></h2>
+<p>Both modules have the ability to check what state they are currently in. To do this run the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;Module Name&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">status</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">status</span>
+</pre></div>
+</div>
+<p>For the temperature module this will return a string stating whether it&#8217;s <cite>heating</cite>, <cite>cooling</cite>, <cite>holding at target</cite> or <cite>idle</cite>.
+For the magnetic module this will return a string stating whether it&#8217;s <cite>engaged</cite> or <cite>disengaged</cite>.</p>
+<div class="section" id="temperature-module">
+<h3>Temperature Module<a class="headerlink" href="#temperature-module" title="Permalink to this headline">¶</a></h3>
+<p>Our temperature module acts as both a cooling and heating device. The range
+of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.</p>
+<p>The temperature module has the following methods that can be accessed during a protocol.</p>
+</div>
+</div>
+<div class="section" id="set-temperature">
+<h2>Set Temperature<a class="headerlink" href="#set-temperature" title="Permalink to this headline">¶</a></h2>
+<p>To set the temperature module to a given temperature in degrees celsius do the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tempdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will set your Temperature module to 4 degrees celsius.</p>
+</div>
+<div class="section" id="wait-until-setpoint-reached">
+<h2>Wait Until Setpoint Reached<a class="headerlink" href="#wait-until-setpoint-reached" title="Permalink to this headline">¶</a></h2>
+<p>This function will pause your protocol until your target temperature is reached.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tempdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">module</span><span class="o">.</span><span class="n">wait_for_temp</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Before using <cite>wait_for_temp()</cite> you must set a target temperature with <cite>set_temperature()</cite>.
+Once the target temperature is set, when you want the protocol to wait until the module
+reaches the target you can call <cite>wait_for_temp().</cite></p>
+<p>If no target temperature is set via <cite>set_temperature()</cite>, the protocol will be stuck in
+an indefinite loop.</p>
+</div>
+<div class="section" id="read-the-current-temperature">
+<h2>Read the Current Temperature<a class="headerlink" href="#read-the-current-temperature" title="Permalink to this headline">¶</a></h2>
+<p>You can read the current real-time temperature of the module by the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tempdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">temperature</span>
+</pre></div>
+</div>
+<p>This will return a float of the temperature in celsius.</p>
+</div>
+<div class="section" id="read-the-target-temperature">
+<h2>Read the Target Temperature<a class="headerlink" href="#read-the-target-temperature" title="Permalink to this headline">¶</a></h2>
+<p>We can read the target temperature of the module by the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tempdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">temperature</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+<p>This will return a float of the temperature that the module is trying to reach.</p>
+</div>
+<div class="section" id="deactivate">
+<h2>Deactivate<a class="headerlink" href="#deactivate" title="Permalink to this headline">¶</a></h2>
+<p>This function will stop heating or cooling and will turn off the fan on the module.
+You would still be able to call <cite>set_temperature()</cite> function to initiate a heating
+or cooling phase again.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;tempdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-flat&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">set_temperature</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">module</span><span class="o">.</span><span class="n">wait_for_temp</span><span class="p">()</span>
+
+<span class="c1">## OTHER PROTOCOL ACTIONS</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>** Note**
+You can also deactivate your temperature module through our Run App by
+clicking on the <cite>Pipettes &amp; Modules</cite> tab. Your temperature module will automatically
+deactivate if another protocol is uploaded to the app. Your temperature module will
+not deactivate automatically upon protocol end, cancel or re-setting a protocol.</p>
+<div class="section" id="magnetic-module">
+<h3>Magnetic Module<a class="headerlink" href="#magnetic-module" title="Permalink to this headline">¶</a></h3>
+<p>The magnetic module has two actions:</p>
+<ul class="simple">
+<li>engage: The magnetic stage rises to a default height unless an <em>offset</em> or a custom <em>height</em> is specified</li>
+<li>disengage: The magnetic stage moves down to its home position</li>
+</ul>
+<p>The magnetic module api is currently fully compatible with the BioRad Hardshell 96-PCR (.2ml) well plates. The magnets will
+default to an engaged height of about 4.3 mm from the bottom of the well (or 18mm from magdeck home position). This is
+roughly 30% of the well depth. This engaged height has been tested for an elution volume of 40ul.</p>
+<p>You can also specify a custom engage height for the magnets so you can use a different labware with the magdeck.
+In the future, we will have adapters to support tuberacks as well as deep well plates.</p>
+</div>
+</div>
+<div class="section" id="engage">
+<h2>Engage<a class="headerlink" href="#engage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;magdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;biorad-hardshell-96-PCR&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">engage</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If you deem that the default engage height is not ideal for your applications,
+you can include an offset in mm for the magnet to move to. The engage function
+will take in a value (positive or negative) to offset the magnets from the <strong>default</strong> position.</p>
+<p>To move the magnets higher than the default position you would specify a positive mm offset such as:
+<code class="docutils literal"><span class="pre">module.engage(offset=4)</span></code></p>
+<p>To move the magnets lower than the default position you would input a negative mm value such as:
+<code class="docutils literal"><span class="pre">module.engage(offset=-4)</span></code></p>
+<p>You can also use a custom height parameter with engage():</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;magdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;96-deep-well&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">engage</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The height should be specified in mm from the magdeck home position (i.e. the position of magnets when power-cycled or
+disengaged)</p>
+<p>** Note **
+<cite>engage()</cite> and <cite>engage(offset=y)</cite> can only be used for labware that have default heights defined in the api. If your
+labware doesn&#8217;t yet have a default height definition and your protocol uses either of those methods then you will get
+an error. Simply use the height parameter to provide a custom height for you labware in such a case.</p>
+</div>
+<div class="section" id="disengage">
+<h2>Disengage<a class="headerlink" href="#disengage" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">modules</span><span class="p">,</span> <span class="n">labware</span>
+
+<span class="n">module</span> <span class="o">=</span> <span class="n">modules</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;magdeck&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">)</span>
+<span class="n">plate</span> <span class="o">=</span> <span class="n">labware</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;biorad-hardshell-96-PCR&#39;</span><span class="p">,</span> <span class="n">slot</span><span class="p">,</span> <span class="n">share</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">module</span><span class="o">.</span><span class="n">engage</span><span class="p">()</span>
+<span class="c1">## OTHER PROTOCOL ACTIONS</span>
+<span class="n">module</span><span class="o">.</span><span class="n">disengage</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The magnetic modules will disengage on power cycle of the device. It will not auto-disengage otherwise
+unless you specify in your protocol.</p>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labware.html">Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Creating a Pipette</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Hardware Modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#loading-your-module-onto-a-deck">Loading your Module onto a deck</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#detecting-your-module-on-the-robot">Detecting your Module on the robot</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#checking-the-status-of-your-module">Checking the status of your Module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#temperature-module">Temperature Module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#set-temperature">Set Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#wait-until-setpoint-reached">Wait Until Setpoint Reached</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-the-current-temperature">Read the Current Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#read-the-target-temperature">Read the Target Temperature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deactivate">Deactivate</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#magnetic-module">Magnetic Module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#engage">Engage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#disengage">Disengage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="robot.html" title="previous chapter">Advanced Control</a></li>
+      <li>Next: <a href="examples.html" title="next chapter">Examples</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/modules.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+  <div class="wrapper">
+
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
+        </form>
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+
+    </section>
+
+  </div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+ });
+</script>
+
+
+ 
+  </body>
+</html>

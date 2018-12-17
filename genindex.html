@@ -1,0 +1,970 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Index &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+ 
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+  app_id: 'ukpodv2l'
+};
+</script>
+<script>
+(function () {
+  var w = window;
+  var ic = w.Intercom;
+  if (typeof ic === "function") {
+    ic('reattach_activator');
+    ic('update', intercomSettings);
+  } else {
+    var d = document;
+    var i = function() {
+      i.c(arguments)
+    };
+    i.q = [];
+    i.c = function(args) {
+      i.q.push(args)
+    };
+    w.Intercom = i;
+
+    function l () {
+      var s = d.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+      var x = d.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+    if (w.attachEvent) {
+        w.attachEvent('onload', l);
+    } else {
+        w.addEventListener('load', l, false);
+    }
+  }
+})()
+</script>
+<script>
+  function toggleNav () {
+    document.getElementById('main-menu').classList.toggle('open');
+  }
+</script>
+
+  </head>
+  <body role="document">
+
+<header id="nav">
+  <nav class="main-menu" id="main-menu" class="">
+    <a href="#" class="brand"><img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+
+    <div id="nav-collapse" onclick="toggleNav()">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </div>
+
+    <ul >
+      <li>
+        <a href="#" class="top-level">
+         Products
+        </a>
+        <ul>
+          <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+          <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+          <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+          <li><a href="https://opentrons.com/modules" >Modules</a></li>
+          <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+          <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+        </ul>
+
+      </li>
+      <li>
+        <a href="#">
+          Company
+        </a>
+        <ul>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">We're Hiring</a></li>
+          <li><a href="https://opentrons.com/about" >About</a></li>
+          <li><a href="https://opentrons.com/team" >Team</a></li>
+          <li><a href="https://blog.opentrons.com/">Blog</a></li>
+          <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          Resources
+        </a>
+        <ul>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="https://shop.opentrons.com/" class="buy">
+          Buy
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ | <a href="#X"><strong>X</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.add_instrument">add_instrument() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.aspirate">aspirate() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.aspirate">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments">BCInstruments (class in opentrons.protocol_api.back_compat)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCLabware">BCLabware (class in opentrons.protocol_api.back_compat)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCModules">BCModules (class in opentrons.protocol_api.back_compat)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCRobot">BCRobot (class in opentrons.protocol_api.back_compat)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.blow_out">blow_out() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.blow_out">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.clear_calibrations">clear_calibrations() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.columns">columns() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.columns_by_index">columns_by_index() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.comment">comment() (opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.config">config (opentrons.protocol_api.contexts.ProtocolContext attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.connect">connect() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCRobot.connect">(opentrons.protocol_api.back_compat.BCRobot method)</a>
+  </dt>
+
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.connect">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.consolidate">consolidate() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.current_volume">current_volume (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.deck">deck (opentrons.protocol_api.contexts.ProtocolContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.delay">delay() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.disconnect">disconnect() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.disconnect">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.dispense">dispense() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.dispense">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.distribute">distribute() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.drop_tip">drop_tip() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.drop_tip">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.flow_rate">flow_rate (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.get_warnings">get_warnings() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.head_speed">head_speed() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.highest_z">highest_z (opentrons.protocol_api.labware.Labware attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.home">home() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.home">(opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.home">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.home">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.home_plunger">home_plunger() (opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.hw_pipette">hw_pipette (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext">InstrumentContext (class in opentrons.protocol_api.contexts)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware">Labware (class in opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Location.labware">labware (opentrons.types.Location attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.load">load() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCLabware.load">(opentrons.protocol_api.back_compat.BCLabware method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.load_calibration">load_calibration() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.load_from_definition">load_from_definition() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.load_instrument">load_instrument() (opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.load_labware">load_labware() (opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.load_labware_by_name">load_labware_by_name() (opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.load_module">load_module() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.load_module_from_definition">load_module_from_definition() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.loaded_instruments">loaded_instruments (opentrons.protocol_api.contexts.ProtocolContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.loaded_labwares">loaded_labwares (opentrons.protocol_api.contexts.ProtocolContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Location">Location (class in opentrons.types)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.ModuleGeometry.location">location (opentrons.protocol_api.labware.ModuleGeometry attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.location_cache">location_cache (opentrons.protocol_api.contexts.ProtocolContext attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.max_volume">max_volume (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.mix">mix() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.ModuleGeometry">ModuleGeometry (class in opentrons.protocol_api.labware)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Mount">Mount (class in opentrons.types)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.move_to">move_to() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.move_to">(opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.move_to">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.name">name (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.name">(opentrons.protocol_api.labware.Labware attribute)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.next_tip">next_tip() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#module-opentrons">opentrons (module)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#module-opentrons.legacy_api.instruments">opentrons.legacy_api.instruments (module)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#module-opentrons.protocol_api.back_compat">opentrons.protocol_api.back_compat (module)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#module-opentrons.protocol_api.contexts">opentrons.protocol_api.contexts (module)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#module-opentrons.protocol_api.labware">opentrons.protocol_api.labware (module)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#module-opentrons.types">opentrons.types (module)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P1000_Single">P1000_Single() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P10_Multi">P10_Multi() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P10_Single">P10_Single() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P300_Multi">P300_Multi() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P300_Single">P300_Single() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P50_Multi">P50_Multi() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.back_compat.BCInstruments.P50_Single">P50_Single() (opentrons.protocol_api.back_compat.BCInstruments method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.parameters">parameters (opentrons.protocol_api.labware.Labware attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.pause">pause() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.pause">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.pick_up_current">pick_up_current (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.pick_up_tip">pick_up_tip() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette">Pipette (class in opentrons.legacy_api.instruments)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.PipetteNotAttachedError">PipetteNotAttachedError</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Point">Point (class in opentrons.types)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Location.point">point (opentrons.types.Location attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext">ProtocolContext (class in opentrons.protocol_api.contexts)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.reset">reset() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.reset">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.resume">resume() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.resume">(opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+      </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.return_tip">return_tip() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.return_tip">(opentrons.protocol_api.contexts.InstrumentContext method)</a>
+  </dt>
+
+      </dl></dd>
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot">Robot (class in opentrons.legacy_api.robot)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.rows">rows() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.rows_by_index">rows_by_index() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.save_calibration">save_calibration() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.save_tip_length">save_tip_length() (in module opentrons.protocol_api.labware)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.set_calibration">set_calibration() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.set_flow_rate">set_flow_rate() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.speeds">speeds (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.robot.Robot.stop">stop() (opentrons.legacy_api.robot.Robot method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.tip_racks">tip_racks (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.touch_tip">touch_tip() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#opentrons.legacy_api.instruments.Pipette.transfer">transfer() (opentrons.legacy_api.instruments.Pipette method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.trash_container">trash_container (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.type">type (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.ProtocolContext.update_config">update_config() (opentrons.protocol_api.contexts.ProtocolContext method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.use_tips">use_tips() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.well">well() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance">well_bottom_clearance (opentrons.protocol_api.contexts.InstrumentContext attribute)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.wells">wells() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.Labware.wells_by_index">wells_by_index() (opentrons.protocol_api.labware.Labware method)</a>
+  </dt>
+
+      
+  <dt><a href="new_protocol_api.html#opentrons.protocol_api.labware.WellShape">WellShape (class in opentrons.protocol_api.labware)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Point.x">x (opentrons.types.Point attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Point.y">y (opentrons.types.Point attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="new_protocol_api.html#opentrons.types.Point.z">z (opentrons.types.Point attribute)</a>
+  </dt>
+
+  </dl></td>
+</tr></table>
+
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labware.html">Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Creating a Pipette</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+  <div class="wrapper">
+
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
+        </form>
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+
+    </section>
+
+  </div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+ });
+</script>
+
+
+ 
+  </body>
+</html>

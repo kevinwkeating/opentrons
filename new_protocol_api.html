@@ -1,0 +1,1601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>New Protocol API &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+ 
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+  app_id: 'ukpodv2l'
+};
+</script>
+<script>
+(function () {
+  var w = window;
+  var ic = w.Intercom;
+  if (typeof ic === "function") {
+    ic('reattach_activator');
+    ic('update', intercomSettings);
+  } else {
+    var d = document;
+    var i = function() {
+      i.c(arguments)
+    };
+    i.q = [];
+    i.c = function(args) {
+      i.q.push(args)
+    };
+    w.Intercom = i;
+
+    function l () {
+      var s = d.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+      var x = d.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+    if (w.attachEvent) {
+        w.attachEvent('onload', l);
+    } else {
+        w.addEventListener('load', l, false);
+    }
+  }
+})()
+</script>
+<script>
+  function toggleNav () {
+    document.getElementById('main-menu').classList.toggle('open');
+  }
+</script>
+
+  </head>
+  <body role="document">
+
+<header id="nav">
+  <nav class="main-menu" id="main-menu" class="">
+    <a href="#" class="brand"><img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+
+    <div id="nav-collapse" onclick="toggleNav()">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </div>
+
+    <ul >
+      <li>
+        <a href="#" class="top-level">
+         Products
+        </a>
+        <ul>
+          <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+          <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+          <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+          <li><a href="https://opentrons.com/modules" >Modules</a></li>
+          <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+          <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+        </ul>
+
+      </li>
+      <li>
+        <a href="#">
+          Company
+        </a>
+        <ul>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">We're Hiring</a></li>
+          <li><a href="https://opentrons.com/about" >About</a></li>
+          <li><a href="https://opentrons.com/team" >Team</a></li>
+          <li><a href="https://blog.opentrons.com/">Blog</a></li>
+          <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          Resources
+        </a>
+        <ul>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="https://shop.opentrons.com/" class="buy">
+          Buy
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <div class="section" id="new-protocol-api">
+<span id="protocol-api"></span><h1>New Protocol API<a class="headerlink" href="#new-protocol-api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-opentrons.protocol_api.back_compat">
+<span id="backwards-compatibility"></span><span id="protocol-api-backcompat"></span><h2>Backwards Compatibility<a class="headerlink" href="#module-opentrons.protocol_api.back_compat" title="Permalink to this headline">¶</a></h2>
+<p>A backwards-compatibility shim for the new protocol API.</p>
+<p>This should not be imported directly; it is used to provide backwards
+compatible singletons in opentrons/__init__.py.</p>
+<dl class="class">
+<dt id="opentrons.protocol_api.back_compat.BCRobot">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.back_compat.</code><code class="descname">BCRobot</code><span class="sig-paren">(</span><em>hardware: opentrons.hardware_control.adapters.SingletonAdapter</em>, <em>protocol_ctx: opentrons.protocol_api.contexts.ProtocolContext</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCRobot" title="Permalink to this definition">¶</a></dt>
+<dd><p>A backwards-compatibility shim for the <a class="reference internal" href="#new-protocol-api">New Protocol API</a>.</p>
+<p>This class is for providing a global instance of a
+<a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a> in an object called <code class="xref py py-attr docutils literal"><span class="pre">robot</span></code>. It
+should not be instantiated by user code, and use of its methods should
+be replaced with methods of <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>. For more
+information on how to replace its methods, see the method documentation.</p>
+<p>Attribute accesses to attributes not defined here will fall back to the
+global <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>; for instance, calling <cite>robot.reset()</cite>
+will fall back to calling <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext.reset" title="opentrons.protocol_api.contexts.ProtocolContext.reset"><code class="xref py py-meth docutils literal"><span class="pre">ProtocolContext.reset()</span></code></a>.</p>
+<p>For more information see <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCRobot.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>port: str = None</em>, <em>options: typing.Any = None</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.back_compat.BCRobot.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to the robot hardware.</p>
+<p>This function is provided for backwards compatibility. In most cases
+it need not be called.</p>
+<p>Calls to this method should be replaced with calls to
+<a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext.connect" title="opentrons.protocol_api.contexts.ProtocolContext.connect"><code class="xref py py-meth docutils literal"><span class="pre">ProtocolContext.connect()</span></code></a> (notice the difference in
+arguments) if necessary; however, since the context of protocols
+executed by an OT2 is automatically connected to either the hardware or
+a simulator (depending on whether the protocol is being simulated or
+run) this should be unnecessary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>port</strong> &#8211; The port to connect to the smoothie board or the magic
+string <code class="docutils literal"><span class="pre">&quot;Virtual</span> <span class="pre">Smoothie&quot;</span></code>, which will initialize and
+connect to a simulator</li>
+<li><strong>options</strong> &#8211; Ignored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.back_compat.</code><code class="descname">BCInstruments</code><span class="sig-paren">(</span><em>ctx: opentrons.protocol_api.contexts.ProtocolContext</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments" title="Permalink to this definition">¶</a></dt>
+<dd><p>A backwards-compatibility shim for the <a class="reference internal" href="#new-protocol-api">New Protocol API</a>.</p>
+<p>This class is provides a replacement for the <cite>opentrons.instrument</cite>
+global instance. Like that global instance, it shims object creation
+functions for ease of use. It should not be instantiated by user code, and
+use of its methods should be replaced with use of the corresponding methods
+of <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>. For information on how to replace calls to
+methods of this class, see the method documentation.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P1000_Single">
+<code class="descname">P1000_Single</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P1000_Single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P1000 Single in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P10_Multi">
+<code class="descname">P10_Multi</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P10_Multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P10 Multi in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P10_Single">
+<code class="descname">P10_Single</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P10_Single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P10 Single in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P300_Multi">
+<code class="descname">P300_Multi</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P300_Multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P300 Multi in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P300_Single">
+<code class="descname">P300_Single</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P300_Single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P300 Single in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P50_Multi">
+<code class="descname">P50_Multi</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P50_Multi" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P50 Multi in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCInstruments.P50_Single">
+<code class="descname">P50_Single</code><span class="sig-paren">(</span><em>mount: str</em>, <em>trash_container: opentrons.protocol_api.labware.Labware = None</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>aspirate_flow_rate: float = None</em>, <em>dispense_flow_rate: float = None</em>, <em>min_volume: float = None</em>, <em>max_volume: float = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCInstruments.P50_Single" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a P50 Single in a backwards-compatible way.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mount</strong> &#8211; The mount to load the instrument. One of
+<cite>&#8216;left&#8217;</cite> or <cite>&#8216;right&#8217;</cite>.</li>
+<li><strong>trash_container</strong> &#8211; If specified, a <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> to
+use for trash.</li>
+<li><strong>tip_racks</strong> &#8211; If specified, a list of <a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>
+containing tips.</li>
+<li><strong>aspirate_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when aspirating. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>dispense_flow_rate</strong> &#8211; If specified, a flow rate (in uL/s)
+to use when dispensing. By default,
+the value from the pipette&#8217;s
+configuration.</li>
+<li><strong>min_volume</strong> &#8211; The minimum volume that can be aspirated at
+once. By default, the pipette&#8217;s minimum
+volume.</li>
+<li><strong>max_volume</strong> &#8211; The maximum volume that can be aspirated at
+once. By default, the pipette&#8217;s maximum
+volume.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext" title="opentrons.protocol_api.contexts.InstrumentContext"><code class="xref py py-class docutils literal"><span class="pre">InstrumentContext</span></code></a>, which represents
+the newly-loaded pipette.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.back_compat.BCLabware">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.back_compat.</code><code class="descname">BCLabware</code><span class="sig-paren">(</span><em>ctx: opentrons.protocol_api.contexts.ProtocolContext</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCLabware" title="Permalink to this definition">¶</a></dt>
+<dd><p>A backwards-compatibility shim for the <a class="reference internal" href="#new-protocol-api">New Protocol API</a>.</p>
+<p>This class provides a replacement for the <cite>opentrons.labware</cite> and
+<cite>opentrons.containers</cite> global instances. Like those global instances,
+this class shims labware load functions for ease of use. This class should
+not be instantiated by user code, and use of its methods should be
+replaced with use of the corresponding functions of
+<a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>. For information on how to replace calls to
+methods of this class, see the method documentation.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.back_compat.BCLabware.load">
+<code class="descname">load</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.back_compat.BCLabware.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a piece of labware by specifying its name and position.</p>
+<p>This method calls <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext.load_labware_by_name" title="opentrons.protocol_api.contexts.ProtocolContext.load_labware_by_name"><code class="xref py py-meth docutils literal"><span class="pre">ProtocolContext.load_labware_by_name()</span></code></a>;
+see that documentation for more information on arguments and return
+values. Calls to this function should be replaced with calls to
+<code class="xref py py-meth docutils literal"><span class="pre">Protocolcontext.load_labware_by_name()</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.back_compat.BCModules">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.back_compat.</code><code class="descname">BCModules</code><span class="sig-paren">(</span><em>ctx: opentrons.protocol_api.contexts.ProtocolContext</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.back_compat.BCModules" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-opentrons.protocol_api.contexts">
+<span id="robot-and-pipette"></span><span id="protocol-api-robot"></span><h2>Robot and Pipette<a class="headerlink" href="#module-opentrons.protocol_api.contexts" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.contexts.</code><code class="descname">ProtocolContext</code><span class="sig-paren">(</span><em>loop: asyncio.events.AbstractEventLoop = None</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Context class is a container for the state of a protocol.</p>
+<p>It encapsulates many of the methods formerly found in the Robot class,
+including labware, instrument, and module loading, as well as core
+functions like pause and resume.</p>
+<p>Unlike the old robot class, it is designed to be ephemeral. The lifetime
+of a particular instance should be about the same as the lifetime of a
+protocol. The only exception is the one stored in
+<code class="xref py py-attr docutils literal"><span class="pre">back_compat.robot</span></code>, which is provided only for back
+compatibility and should be used less and less as time goes by.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.comment">
+<code class="descname">comment</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.comment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a user-readable comment string that will be echoed to the
+Opentrons app.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.config">
+<code class="descname">config</code><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the robot&#8217;s configuration object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">Returns .robot_config:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">The loaded configuration.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>hardware: opentrons.hardware_control.API</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connect to a running hardware API.</p>
+<p>This can be either a simulator or a full hardware controller.</p>
+<p>Note that there is no true disconnected state for a
+<a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext" title="opentrons.protocol_api.contexts.ProtocolContext"><code class="xref py py-class docutils literal"><span class="pre">ProtocolContext</span></code></a>; <a class="reference internal" href="#opentrons.protocol_api.contexts.ProtocolContext.disconnect" title="opentrons.protocol_api.contexts.ProtocolContext.disconnect"><code class="xref py py-meth docutils literal"><span class="pre">disconnect()</span></code></a> simply creates
+a new simulator and replaces the current hardware with it.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.deck">
+<code class="descname">deck</code><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.deck" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object holding the deck layout of the robot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.disconnect">
+<code class="descname">disconnect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.disconnect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disconnect from currently-connected hardware and simulate instead</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.home">
+<code class="descname">home</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Homes the robot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.load_instrument">
+<code class="descname">load_instrument</code><span class="sig-paren">(</span><em>instrument_name: str</em>, <em>mount: opentrons.types.Mount</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>replace: bool = False</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.load_instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a specific instrument required by the protocol.</p>
+<p>This value will actually be checked when the protocol runs, to
+ensure that the correct instrument is attached in the specified
+location.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>instrument_name</strong> (<em>str</em>) &#8211; The name of the instrument model, or a
+prefix. For instance, &#8216;p10_single&#8217; may be
+used to request a P10 single regardless of
+the version.</li>
+<li><strong>mount</strong> (<a class="reference internal" href="#opentrons.types.Mount" title="opentrons.types.Mount"><em>types.Mount</em></a>) &#8211; The mount in which this instrument should be
+attached.</li>
+<li><strong>tip_racks</strong> (List[<a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a>]) &#8211; A list of tip racks from which to pick tips if
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal"><span class="pre">InstrumentContext.pick_up_tip()</span></code></a> is called
+without arguments.</li>
+<li><strong>replace</strong> (<em>bool</em>) &#8211; Indicate that the currently-loaded instrument in
+<cite>mount</cite> (if such an instrument exists) should be
+replaced by <cite>instrument_name</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.load_labware">
+<code class="descname">load_labware</code><span class="sig-paren">(</span><em>labware_obj: opentrons.protocol_api.labware.Labware, location: typing.Union[int, str], label: str = None, share: bool = False</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.Labware<a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.load_labware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify the presence of a piece of labware on the OT2 deck.</p>
+<p>This function loads the labware specified by <cite>labware</cite>
+(previously loaded from a configuration file) to the location
+specified by <cite>location</cite>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.load_labware_by_name">
+<code class="descname">load_labware_by_name</code><span class="sig-paren">(</span><em>labware_name: str, location: typing.Union[int, str]</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.Labware<a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.load_labware_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience function to specify a piece of labware by name.</p>
+<p>For labware already defined by Opentrons, this is a convient way
+to collapse the two stages of labware initialization (creating
+the labware and adding it to the protocol) into one.</p>
+<p>This function returns the created and initialized labware for use
+later in the protocol.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.loaded_instruments">
+<code class="descname">loaded_instruments</code><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.loaded_instruments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the instruments that have been loaded into the protocol.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A dict mapping mount names in lowercase to the instrument
+in that mount, or <cite>None</cite> if no instrument is present.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.loaded_labwares">
+<code class="descname">loaded_labwares</code><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.loaded_labwares" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the labwares that have been loaded into the protocol context.</p>
+<p>The return value is a dict mapping locations to labware, sorted
+in order of the locations.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.location_cache">
+<code class="descname">location_cache</code><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.location_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>The cache used by the robot to determine where it last was.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.pause">
+<code class="descname">pause</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.pause" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pause execution of the protocol until resume is called.</p>
+<p>Note: This function call will not return until the protocol
+is resumed (presumably by a user in the run app).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the state of the context and the hardware.</p>
+<p>For instance, this call will
+- reset all cached knowledge about attached tips
+- unload all labware
+- unload all instruments
+- clear all location and instrument caches</p>
+<p>The only state that will be kept is the position of the robot.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.resume">
+<code class="descname">resume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.resume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resume a previously-paused protocol.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.ProtocolContext.update_config">
+<code class="descname">update_config</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.contexts.ProtocolContext.update_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update values of the robot&#8217;s configuration.</p>
+<p><cite>kwargs</cite> should contain keys of the robot&#8217;s configuration. For instace,
+<cite>update_config(name=&#8217;Grace Hopper&#8217;)</cite> would change the name of the robot</p>
+<p>Documentation on keys can be found in the documentation for
+<code class="xref py py-class docutils literal"><span class="pre">robot_config</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.contexts.</code><code class="descname">InstrumentContext</code><span class="sig-paren">(</span><em>ctx: opentrons.protocol_api.contexts.ProtocolContext</em>, <em>hardware: opentrons.hardware_control.adapters.SynchronousAdapter</em>, <em>mount: opentrons.types.Mount</em>, <em>log_parent: logging.Logger</em>, <em>tip_racks: typing.List[opentrons.protocol_api.labware.Labware] = None</em>, <em>trash: opentrons.protocol_api.labware.Labware = None</em>, <em>**config_kwargs</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>A context for a specific pipette or instrument.</p>
+<p>This can be used to call methods related to pipettes - moves or
+aspirates or dispenses, or higher-level methods.</p>
+<p>Instances of this class bundle up state and config changes to a
+pipette - for instance, changes to flow rates or trash containers.
+Action methods (like <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.aspirate" title="opentrons.protocol_api.contexts.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal"><span class="pre">aspirate()</span></code></a> or <code class="xref py py-meth docutils literal"><span class="pre">distribute()</span></code>) are
+defined here for convenience.</p>
+<p>In general, this class should not be instantiated directly; rather,
+instances are returned from <code class="xref py py-meth docutils literal"><span class="pre">ProtcolContext.load_instrument()</span></code>.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.aspirate">
+<code class="descname">aspirate</code><span class="sig-paren">(</span><em>volume: float = None</em>, <em>location: typing.Union[opentrons.types.Location</em>, <em>opentrons.protocol_api.labware.Well] = None</em>, <em>rate: float = 1.0</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.aspirate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Aspirate a volume of liquid (in microliters/uL) using this pipette
+from the specified location</p>
+<p>If only a volume is passed, the pipette will aspirate
+from its current position. If only a location is passed,
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.aspirate" title="opentrons.protocol_api.contexts.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal"><span class="pre">aspirate()</span></code></a> will default to its <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.max_volume" title="opentrons.protocol_api.contexts.InstrumentContext.max_volume"><code class="xref py py-attr docutils literal"><span class="pre">max_volume</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>volume</strong> (<em>int or float</em>) &#8211; The volume to aspirate, in microliters. If not
+specified, <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.max_volume" title="opentrons.protocol_api.contexts.InstrumentContext.max_volume"><code class="xref py py-attr docutils literal"><span class="pre">max_volume</span></code></a>.</li>
+<li><strong>location</strong> &#8211; Where to aspirate from. If <cite>location</cite> is a
+<code class="xref py py-class docutils literal"><span class="pre">Well</span></code>, the robot will aspirate from
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance" title="opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance"><code class="xref py py-attr docutils literal"><span class="pre">well_bottom_clearance</span></code></a> mm
+above the bottom of the well. If <cite>location</cite> is a
+<a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> (i.e. the result of
+<code class="xref py py-meth docutils literal"><span class="pre">Well.top()</span></code> or <code class="xref py py-meth docutils literal"><span class="pre">Well.bottom()</span></code>), the
+robot will aspirate from the exact specified location.
+If unspecified, the robot will aspirate from the
+current position.</li>
+<li><strong>rate</strong> (<em>float</em>) &#8211; The relative plunger speed for this aspirate. During
+this aspirate, the speed of the plunger will be
+<cite>rate</cite> * <code class="xref py py-attr docutils literal"><span class="pre">aspirate_speed</span></code>. If not specified,
+defaults to 1.0 (speed will not be modified).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">This instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.blow_out">
+<code class="descname">blow_out</code><span class="sig-paren">(</span><em>location: opentrons.protocol_api.labware.Well = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.blow_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blow liquid out of the tip.</p>
+<p>If called without arguments, blow out into the
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.trash_container" title="opentrons.protocol_api.contexts.InstrumentContext.trash_container"><code class="xref py py-attr docutils literal"><span class="pre">trash_container</span></code></a>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.current_volume">
+<code class="descname">current_volume</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.current_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current amount of liquid, in microliters, held in the pipette.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.dispense">
+<code class="descname">dispense</code><span class="sig-paren">(</span><em>volume: float = None</em>, <em>location: typing.Union[opentrons.types.Location</em>, <em>opentrons.protocol_api.labware.Well] = None</em>, <em>rate: float = 1.0</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.dispense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispense a volume of liquid (in microliters/uL) using this pipette
+into the specified location.</p>
+<p>If only a volume is passed, the pipette will dispense from its current
+position. If only a location is passed, all of the liquid aspirated
+into the pipette will be dispensed (this volume is accessible through
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.current_volume" title="opentrons.protocol_api.contexts.InstrumentContext.current_volume"><code class="xref py py-attr docutils literal"><span class="pre">current_volume</span></code></a>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>volume</strong> (<em>int or float</em>) &#8211; The volume of liquid to dispense, in microliters. If not
+specified, defaults to <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.current_volume" title="opentrons.protocol_api.contexts.InstrumentContext.current_volume"><code class="xref py py-attr docutils literal"><span class="pre">current_volume</span></code></a>.</li>
+<li><strong>location</strong> &#8211; Where to dispense into. If <cite>location</cite> is a
+<code class="xref py py-class docutils literal"><span class="pre">Well</span></code>, the robot will dispense into
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance" title="opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance"><code class="xref py py-attr docutils literal"><span class="pre">well_bottom_clearance</span></code></a> mm
+above the bottom of the well. If <cite>location</cite> is a
+<a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> (i.e. the result of
+<code class="xref py py-meth docutils literal"><span class="pre">Well.top()</span></code> or <code class="xref py py-meth docutils literal"><span class="pre">Well.bottom()</span></code>), the
+robot will dispense into the exact specified location.
+If unspecified, the robot will dispense into the
+current position.</li>
+<li><strong>rate</strong> (<em>float</em>) &#8211; The relative plunger speed for this dispense. During
+this dispense, the speed of the plunger will be
+<cite>rate</cite> * <code class="xref py py-attr docutils literal"><span class="pre">dispense_speed</span></code>. If not specified,
+defaults to 1.0 (speed will not be modified).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">This instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.drop_tip">
+<code class="descname">drop_tip</code><span class="sig-paren">(</span><em>location: opentrons.types.Location = None</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.drop_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drop the current tip.</p>
+<p>If a location is specified, drop the tip there, otherwise drop it into
+the fixed trash.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">OT1 required homing the plunger after dropping tips, so the prior
+version of <cite>drop_tip</cite> automatically homed the plunger. This is no
+longer needed in OT2. If you need to home the plunger, use
+<a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.home_plunger" title="opentrons.protocol_api.contexts.InstrumentContext.home_plunger"><code class="xref py py-meth docutils literal"><span class="pre">home_plunger()</span></code></a>.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>location</strong> (<a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">types.Location</span></code></a> or None) &#8211; The location to drop the tip</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">This instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.flow_rate">
+<code class="descname">flow_rate</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.flow_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>The speeds (in uL/s) configured for the pipette, as a dict.</p>
+<p>The  keys will be &#8216;aspirate&#8217; and &#8216;dispense&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">This property is equivalent to <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.speeds" title="opentrons.protocol_api.contexts.InstrumentContext.speeds"><code class="xref py py-attr docutils literal"><span class="pre">speeds</span></code></a>; the only</td>
+</tr>
+</tbody>
+</table>
+<p>difference is the units in which this property is specified.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.home">
+<code class="descname">home</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.home" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home the robot.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.home_plunger">
+<code class="descname">home_plunger</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.home_plunger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Home the plunger associated with this mount</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.hw_pipette">
+<code class="descname">hw_pipette</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.hw_pipette" title="Permalink to this definition">¶</a></dt>
+<dd><p>View the information returned by the hardware API directly.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body">a <a class="reference internal" href="#opentrons.types.PipetteNotAttachedError" title="opentrons.types.PipetteNotAttachedError"><code class="xref py py-class docutils literal"><span class="pre">types.PipetteNotAttachedError</span></code></a> if the pipette is
+no longer attached (should not happen).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.max_volume">
+<code class="descname">max_volume</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.max_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum volume, in microliters, this pipette can hold.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.move_to">
+<code class="descname">move_to</code><span class="sig-paren">(</span><em>location: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.move_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the instrument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>location</strong> (<a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">types.Location</span></code></a>) &#8211; The location to move to.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.name">
+<code class="descname">name</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The model string for the pipette.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.pick_up_current">
+<code class="descname">pick_up_current</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.pick_up_current" title="Permalink to this definition">¶</a></dt>
+<dd><p>The current (amperes) the pipette mount&#8217;s motor will use
+while picking up a tip. Specified in amps.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip">
+<code class="descname">pick_up_tip</code><span class="sig-paren">(</span><em>location: opentrons.types.Location = None</em>, <em>presses: int = 3</em>, <em>increment: float = 1.0</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pick up a tip for the pipette to run liquid-handling commands with</p>
+<p>A tip can be manually set by passing a <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">types.Location</span></code></a>.
+If no location is passed, the Pipette will pick up the next available
+tip in its <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.tip_racks" title="opentrons.protocol_api.contexts.InstrumentContext.tip_racks"><code class="xref py py-attr docutils literal"><span class="pre">InstrumentContext.tip_racks</span></code></a> list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>location</strong> (<a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">types.Location</span></code></a>) &#8211; The location from which to pick up a tip.</li>
+<li><strong>presses</strong> (<em>int</em>) &#8211; The number of times to lower and then raise the pipette
+when picking up a tip, to ensure a good seal (0 [zero]
+will result in the pipette hovering over the tip but
+not picking it up&#8211;generally not desireable, but could
+be used for dry-run).</li>
+<li><strong>increment</strong> (<em>float</em>) &#8211; The additional distance to travel on each successive
+press (e.g.: if <cite>presses=3</cite> and <cite>increment=1.0</cite>, then
+the first press will travel down into the tip by
+3.5mm, the second by 4.5mm, and the third by 5.5mm).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">This instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.return_tip">
+<code class="descname">return_tip</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.contexts.InstrumentContext<a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.return_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>If a tip is currently attached to the pipette, then it will return the
+tip to it&#8217;s location in the tiprack.</p>
+<p>It will not reset tip tracking so the well flag will remain False.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">This instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.speeds">
+<code class="descname">speeds</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.speeds" title="Permalink to this definition">¶</a></dt>
+<dd><p>The speeds (in mm/s) configured for the pipette, as a dict.</p>
+<p>The keys will be &#8216;aspirate&#8217; and &#8216;dispense&#8217; (e.g. the keys of
+<code class="xref py py-class docutils literal"><span class="pre">MODE</span></code>)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Note:</th><td class="field-body">This property is equivalent to <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.speeds" title="opentrons.protocol_api.contexts.InstrumentContext.speeds"><code class="xref py py-attr docutils literal"><span class="pre">speeds</span></code></a>; the only</td>
+</tr>
+</tbody>
+</table>
+<p>difference is the units in which this property is specified.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.tip_racks">
+<code class="descname">tip_racks</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.tip_racks" title="Permalink to this definition">¶</a></dt>
+<dd><p>The tip racks that have been linked to this pipette.</p>
+<p>This is the property used to determine which tips to pick up next when
+calling <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip" title="opentrons.protocol_api.contexts.InstrumentContext.pick_up_tip"><code class="xref py py-meth docutils literal"><span class="pre">pick_up_tip()</span></code></a> without arguments.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.trash_container">
+<code class="descname">trash_container</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.trash_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>The trash container associated with this pipette.</p>
+<p>This is the property used to determine where to drop tips and blow out
+liquids when calling <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.drop_tip" title="opentrons.protocol_api.contexts.InstrumentContext.drop_tip"><code class="xref py py-meth docutils literal"><span class="pre">drop_tip()</span></code></a> or <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.blow_out" title="opentrons.protocol_api.contexts.InstrumentContext.blow_out"><code class="xref py py-meth docutils literal"><span class="pre">blow_out()</span></code></a> without
+arguments.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.type">
+<code class="descname">type</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>One of <cite>&#8216;single&#8217;</cite> or <cite>&#8216;multi&#8217;</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance">
+<code class="descname">well_bottom_clearance</code><a class="headerlink" href="#opentrons.protocol_api.contexts.InstrumentContext.well_bottom_clearance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The distance above the bottom of a well to aspirate or dispense.</p>
+<p>When <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.aspirate" title="opentrons.protocol_api.contexts.InstrumentContext.aspirate"><code class="xref py py-meth docutils literal"><span class="pre">aspirate()</span></code></a> or <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.dispense" title="opentrons.protocol_api.contexts.InstrumentContext.dispense"><code class="xref py py-meth docutils literal"><span class="pre">dispense()</span></code></a> is given a
+<code class="xref py py-class docutils literal"><span class="pre">Well</span></code> rather than a full <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a>, the robot
+will move this distance above the bottom of the well to aspirate or
+dispense.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-opentrons.protocol_api.labware">
+<span id="labware-and-wells"></span><span id="protocol-api-labware"></span><h2>Labware and Wells<a class="headerlink" href="#module-opentrons.protocol_api.labware" title="Permalink to this headline">¶</a></h2>
+<p>This module will replace Placeable</p>
+<dl class="class">
+<dt id="opentrons.protocol_api.labware.Labware">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">Labware</code><span class="sig-paren">(</span><em>definition: dict</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.labware.Labware" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents a labware, such as a PCR plate, a tube rack, trough,
+tip rack, etc. It defines the physical geometry of the labware, and
+provides methods for accessing wells within the labware.</p>
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.columns">
+<code class="descname">columns</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span> &rarr; typing.List[typing.List[opentrons.protocol_api.labware.Well]]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to navigate through a labware by column.</p>
+<p>With indexing one can treat it as a typical python nested list.
+To access row A for example,
+simply write: labware.columns()[0]
+This will output [&#8216;A1&#8217;, &#8216;B1&#8217;, &#8216;C1&#8217;, &#8216;D1&#8217;...].</p>
+<p>Note that this method takes args for backward-compatibility, but use
+of args is deprecated and will be removed in future versions. Args
+can be either strings or integers, but must all be the same type (e.g.:
+<cite>self.columns(1, 4, 8)</cite> or <cite>self.columns(&#8216;1&#8217;, &#8216;2&#8217;)</cite>, but
+<cite>self.columns(&#8216;1&#8217;, 4)</cite> is invalid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of column lists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.columns_by_index">
+<code class="descname">columns_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; typing.Dict[str, typing.List[opentrons.protocol_api.labware.Well]]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.columns_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to navigate through a labware by column name.</p>
+<p>With indexing one can treat it as a typical python dictionary.
+To access row A for example,
+simply write: labware.columns_by_index()[&#8216;1&#8217;]
+This will output [&#8216;A1&#8217;, &#8216;B1&#8217;, &#8216;C1&#8217;, &#8216;D1&#8217;...].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary of Well lists keyed by column name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.labware.Labware.highest_z">
+<code class="descname">highest_z</code><a class="headerlink" href="#opentrons.protocol_api.labware.Labware.highest_z" title="Permalink to this definition">¶</a></dt>
+<dd><p>The z-coordinate of the tallest single point anywhere on the labware.</p>
+<p>This is drawn from the &#8216;dimensions&#8217;/&#8217;overallHeight&#8217; elements of the
+labware definition and takes into account the calibration offset.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.labware.Labware.name">
+<code class="descname">name</code><a class="headerlink" href="#opentrons.protocol_api.labware.Labware.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The canonical name of the labware, which is used to load it</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.next_tip">
+<code class="descname">next_tip</code><span class="sig-paren">(</span><em>num_tips: int = 1</em><span class="sig-paren">)</span> &rarr; typing.Union[opentrons.protocol_api.labware.Well, NoneType]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.next_tip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the next valid well for pick-up.</p>
+<p>Determines the next valid start tip from which to retrieve the
+specified number of tips. There must be at least <cite>num_tips</cite> sequential
+wells for which all wells have tips, in the same column.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>num_tips</strong> (<em>int</em>) &#8211; target number of sequential tips in the same column</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the <code class="xref py py-class docutils literal"><span class="pre">Well</span></code> meeting the target criteria, or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.protocol_api.labware.Labware.parameters">
+<code class="descname">parameters</code><a class="headerlink" href="#opentrons.protocol_api.labware.Labware.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Internal properties of a labware including type and quirks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.rows">
+<code class="descname">rows</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span> &rarr; typing.List[typing.List[opentrons.protocol_api.labware.Well]]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to navigate through a labware by row.</p>
+<p>With indexing one can treat it as a typical python nested list.
+To access row A for example, simply write: labware.rows()[0]. This
+will output [&#8216;A1&#8217;, &#8216;A2&#8217;, &#8216;A3&#8217;, &#8216;A4&#8217;...]</p>
+<p>Note that this method takes args for backward-compatibility, but use
+of args is deprecated and will be removed in future versions. Args
+can be either strings or integers, but must all be the same type (e.g.:
+<cite>self.rows(1, 4, 8)</cite> or <cite>self.rows(&#8216;A&#8217;, &#8216;B&#8217;)</cite>, but  <cite>self.rows(&#8216;A&#8217;, 4)</cite>
+is invalid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of row lists</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.rows_by_index">
+<code class="descname">rows_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; typing.Dict[str, typing.List[opentrons.protocol_api.labware.Well]]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.rows_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to navigate through a labware by row name.</p>
+<p>With indexing one can treat it as a typical python dictionary.
+To access row A for example, simply write: labware.rows_by_index()[&#8216;A&#8217;]
+This will output [&#8216;A1&#8217;, &#8216;A2&#8217;, &#8216;A3&#8217;, &#8216;A4&#8217;...].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary of Well lists keyed by row name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.set_calibration">
+<code class="descname">set_calibration</code><span class="sig-paren">(</span><em>delta: opentrons.types.Point</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.Labware.set_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called by save calibration in order to update the offset on the object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.use_tips">
+<code class="descname">use_tips</code><span class="sig-paren">(</span><em>start_well: opentrons.protocol_api.labware.Well</em>, <em>num_channels: int = 1</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.Labware.use_tips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes tips from the tip tracker.</p>
+<p>This method should be called when a tip is picked up. Generally, it
+will be called with <cite>num_channels=1</cite> or <cite>num_channels=8</cite> for single-
+and multi-channel respectively. If picking up with more than one
+channel, this method will automatically determine which tips are used
+based on the start well, the number of channels, and the geometry of
+the tiprack.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start_well</strong> (<code class="xref py py-class docutils literal"><span class="pre">Well</span></code>) &#8211; The <code class="xref py py-class docutils literal"><span class="pre">Well</span></code> from which to pick up a tip.
+For a single-channel pipette, this is the well to
+send the pipette to. For a multi-channel pipette,
+this is the well to send the back-most nozzle of the
+pipette to.</li>
+<li><strong>num_channels</strong> (<em>int</em>) &#8211; The number of channels for the current pipette</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.well">
+<code class="descname">well</code><span class="sig-paren">(</span><em>idx</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.Well<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.well" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deprecated&#8212;use result of <cite>wells</cite> or <cite>wells_by_index</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.wells">
+<code class="descname">wells</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span> &rarr; typing.List[opentrons.protocol_api.labware.Well]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.wells" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to generate a list of wells in top -&gt; down,
+left -&gt; right order. This is representative of moving down <cite>rows</cite> and
+across <cite>columns</cite> (e.g. &#8216;A1&#8217;, &#8216;B1&#8217;, &#8216;C1&#8217;...&#8217;A2&#8217;, &#8216;B2&#8217;, &#8216;C2&#8217;)</p>
+<p>With indexing one can treat it as a typical python
+list. To access well A1, for example, simply write: labware.wells()[0]</p>
+<p>Note that this method takes args for backward-compatibility, but use
+of args is deprecated and will be removed in future versions. Args
+can be either strings or integers, but must all be the same type (e.g.:
+<cite>self.wells(1, 4, 8)</cite> or <cite>self.wells(&#8216;A1&#8217;, &#8216;B2&#8217;)</cite>, but
+<cite>self.wells(&#8216;A1&#8217;, 4)</cite> is invalid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Ordered list of all wells in a labware</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="opentrons.protocol_api.labware.Labware.wells_by_index">
+<code class="descname">wells_by_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &rarr; typing.Dict[str, opentrons.protocol_api.labware.Well]<a class="headerlink" href="#opentrons.protocol_api.labware.Labware.wells_by_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessor function used to create a look-up table of Wells by name.</p>
+<p>With indexing one can treat it as a typical python
+dictionary whose keys are well names. To access well A1, for example,
+simply write: labware.wells_by_index()[&#8216;A1&#8217;]</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary of well objects keyed by well name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.labware.ModuleGeometry">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">ModuleGeometry</code><span class="sig-paren">(</span><em>definition: dict</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; None<a class="headerlink" href="#opentrons.protocol_api.labware.ModuleGeometry" title="Permalink to this definition">¶</a></dt>
+<dd><p>This class represents an active peripheral, such as an Opentrons MagBead
+Module or Temperature Module. It defines the physical geometry of the
+device (primarily the offset that modifies the position of the labware
+mounted on top of it).</p>
+<dl class="attribute">
+<dt id="opentrons.protocol_api.labware.ModuleGeometry.location">
+<code class="descname">location</code><a class="headerlink" href="#opentrons.protocol_api.labware.ModuleGeometry.location" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>return</em> &#8211; a <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> representing the top of the module</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.protocol_api.labware.WellShape">
+<em class="property">class </em><code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">WellShape</code><a class="headerlink" href="#opentrons.protocol_api.labware.WellShape" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.clear_calibrations">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">clear_calibrations</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.clear_calibrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all calibration files for labware. This includes deleting tip-length
+data for tipracks.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.load">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">load</code><span class="sig-paren">(</span><em>name: str</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.Labware<a class="headerlink" href="#opentrons.protocol_api.labware.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a labware object constructed from a labware definition dict looked
+up by name (definition must have been previously stored locally on the
+robot)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; A string to use for looking up a labware definition previously
+saved to disc. The definition file must have been saved in a known
+location with the filename &#8216;${name}.json&#8217;</li>
+<li><strong>parent</strong> &#8211; A <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> representing the location where
+the front and left most point of the outside of labware is
+(often the front-left corner of a slot on the deck).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.load_calibration">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">load_calibration</code><span class="sig-paren">(</span><em>labware: opentrons.protocol_api.labware.Labware</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.load_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up a calibration if it exists and apply it to the given labware.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.load_from_definition">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">load_from_definition</code><span class="sig-paren">(</span><em>definition: dict</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.Labware<a class="headerlink" href="#opentrons.protocol_api.labware.load_from_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a labware object constructed from a provided labware definition dict</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>definition</strong> &#8211; A dict representing all required data for a labware,
+including metadata such as the display name of the labware, a
+definition of the order to iterate over wells, the shape of wells
+(shape, physical dimensions, etc), and so on. The correct shape of
+this definition is governed by the &#8220;labware-designer&#8221; project in
+the Opentrons/opentrons repo.</li>
+<li><strong>parent</strong> &#8211; A <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> representing the location where
+the front and left most point of the outside of labware is
+(often the front-left corner of a slot on the deck).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.load_module">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">load_module</code><span class="sig-paren">(</span><em>name: str</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.ModuleGeometry<a class="headerlink" href="#opentrons.protocol_api.labware.load_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="#opentrons.protocol_api.labware.ModuleGeometry" title="opentrons.protocol_api.labware.ModuleGeometry"><code class="xref py py-class docutils literal"><span class="pre">ModuleGeometry</span></code></a> object from a definition looked up
+by name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> &#8211; A string to use for looking up the definition. The string
+must be present as a top-level key in moduleSpecs.json.</li>
+<li><strong>parent</strong> &#8211; A <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> representing the location where
+the front and left most point of the outside of the module
+is (often the front-left corner of a slot on the deck).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.load_module_from_definition">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">load_module_from_definition</code><span class="sig-paren">(</span><em>definition: dict</em>, <em>parent: opentrons.types.Location</em><span class="sig-paren">)</span> &rarr; opentrons.protocol_api.labware.ModuleGeometry<a class="headerlink" href="#opentrons.protocol_api.labware.load_module_from_definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a <a class="reference internal" href="#opentrons.protocol_api.labware.ModuleGeometry" title="opentrons.protocol_api.labware.ModuleGeometry"><code class="xref py py-class docutils literal"><span class="pre">ModuleGeometry</span></code></a> object from a specified definition</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>definition</strong> &#8211; A dict representing all required data for a module&#8217;s
+geometry.</li>
+<li><strong>parent</strong> &#8211; A <a class="reference internal" href="#opentrons.types.Location" title="opentrons.types.Location"><code class="xref py py-class docutils literal"><span class="pre">Location</span></code></a> representing the location where
+the front and left most point of the outside of the module
+is (often the front-left corner of a slot on the deck).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.save_calibration">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">save_calibration</code><span class="sig-paren">(</span><em>labware: opentrons.protocol_api.labware.Labware</em>, <em>delta: opentrons.types.Point</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.save_calibration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be used whenever an updated delta is found for the first well
+of a given labware. If an offset file does not exist, create the file
+using labware id as the filename. If the file does exist, load it and
+modify the delta and the lastModified fields under the &#8220;default&#8221; key.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="opentrons.protocol_api.labware.save_tip_length">
+<code class="descclassname">opentrons.protocol_api.labware.</code><code class="descname">save_tip_length</code><span class="sig-paren">(</span><em>labware: opentrons.protocol_api.labware.Labware</em>, <em>length: float</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.protocol_api.labware.save_tip_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to be used whenever an updated tip length is found for
+of a given tip rack. If an offset file does not exist, create the file
+using labware id as the filename. If the file does exist, load it and
+modify the length and the lastModified fields under the &#8220;tipLength&#8221; key.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-opentrons.types">
+<span id="useful-types-and-definitions"></span><span id="protocol-api-types"></span><h2>Useful Types and Definitions<a class="headerlink" href="#module-opentrons.types" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="opentrons.types.Location">
+<em class="property">class </em><code class="descclassname">opentrons.types.</code><code class="descname">Location</code><a class="headerlink" href="#opentrons.types.Location" title="Permalink to this definition">¶</a></dt>
+<dd><p>A location to target as a motion in the <a class="reference internal" href="#protocol-api"><span class="std std-ref">New Protocol API</span></a>.</p>
+<p>The location contains a <a class="reference internal" href="#opentrons.types.Point" title="opentrons.types.Point"><code class="xref py py-class docutils literal"><span class="pre">Point</span></code></a> (in
+<span class="xref std std-ref">protocol-api-deck-coordinates</span>) and possibly an associated
+<a class="reference internal" href="#opentrons.protocol_api.labware.Labware" title="opentrons.protocol_api.labware.Labware"><code class="xref py py-class docutils literal"><span class="pre">Labware</span></code></a> or <code class="xref py py-class docutils literal"><span class="pre">Well</span></code> instance.</p>
+<p>It should rarely be constructed directly by the user; rather, it is the
+return type of most <code class="xref py py-class docutils literal"><span class="pre">Well</span></code> accessors like <code class="xref py py-meth docutils literal"><span class="pre">Well.top()</span></code>
+and is passed directly into a method like
+<code class="xref py py-meth docutils literal"><span class="pre">InstrumentContext.aspirate()</span></code>.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <a class="reference internal" href="#opentrons.types.Location.labware" title="opentrons.types.Location.labware"><code class="xref py py-attr docutils literal"><span class="pre">labware</span></code></a> attribute of this class is used by the protocol
+API internals to, among other things, determine safe heights to retract
+the instruments to when moving between locations. If constructing an
+instance of this class manually, be sure to either specify <cite>None</cite> as the
+labware (so the robot does its worst case retraction) or specify the
+correct labware for the <a class="reference internal" href="#opentrons.types.Location.point" title="opentrons.types.Location.point"><code class="xref py py-attr docutils literal"><span class="pre">point</span></code></a> attribute.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <cite>==</cite> operation compares both the position and associated labware.
+If you only need to compare locations, compare the <a class="reference internal" href="#opentrons.types.Location.point" title="opentrons.types.Location.point"><code class="xref py py-attr docutils literal"><span class="pre">point</span></code></a>
+of each item.</p>
+</div>
+<dl class="attribute">
+<dt id="opentrons.types.Location.labware">
+<code class="descname">labware</code><a class="headerlink" href="#opentrons.types.Location.labware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.types.Location.point">
+<code class="descname">point</code><a class="headerlink" href="#opentrons.types.Location.point" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.types.Mount">
+<em class="property">class </em><code class="descclassname">opentrons.types.</code><code class="descname">Mount</code><a class="headerlink" href="#opentrons.types.Mount" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="opentrons.types.PipetteNotAttachedError">
+<em class="property">exception </em><code class="descclassname">opentrons.types.</code><code class="descname">PipetteNotAttachedError</code><a class="headerlink" href="#opentrons.types.PipetteNotAttachedError" title="Permalink to this definition">¶</a></dt>
+<dd><p>An error raised if a pipette is accessed that is not attached</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="opentrons.types.Point">
+<em class="property">class </em><code class="descclassname">opentrons.types.</code><code class="descname">Point</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>z</em><span class="sig-paren">)</span><a class="headerlink" href="#opentrons.types.Point" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="opentrons.types.Point.x">
+<code class="descname">x</code><a class="headerlink" href="#opentrons.types.Point.x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.types.Point.y">
+<code class="descname">y</code><a class="headerlink" href="#opentrons.types.Point.y" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="opentrons.types.Point.z">
+<code class="descname">z</code><a class="headerlink" href="#opentrons.types.Point.z" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="deck-coordinates">
+<span id="protocol-api-deck-coords"></span><h2>Deck Coordinates<a class="headerlink" href="#deck-coordinates" title="Permalink to this headline">¶</a></h2>
+<p>The OT2’s base coordinate system is known as deck coordinates. This coordinate system is referenced frequently through the API. It is a right-handed coordinate system always specified in mm, with <cite>(0, 0, 0)</cite> at the front left of the robot. <cite>+x</cite> is to the right, <cite>+y</cite> is to the back, and <cite>+z</cite> is up.</p>
+<p>Note that there are technically two <cite>z</cite> axes, one for each pipette mount. In these terms, <cite>z</cite> is the axis of the left pipette mount and <cite>a</cite> is the axis of the right pipette mount. These are obscured by the API’s habit of defining motion commands on a per-pipette basis; the pipettes internally select the correct <cite>z</cite> axis to move. This is also true of the pipette plunger axes, <cite>b</cite> (left) and <cite>c</cite> (right).</p>
+<p>When locations are specified to functions like <a class="reference internal" href="#opentrons.protocol_api.contexts.InstrumentContext.move_to" title="opentrons.protocol_api.contexts.InstrumentContext.move_to"><code class="xref py py-meth docutils literal"><span class="pre">opentrons.protocol_api.contexts.InstrumentContext.move_to()</span></code></a>, in addition to being an instance of <code class="xref py py-class docutils literal"><span class="pre">opentrons.protocol_api.labware.Well</span></code> they may define coordinates in this deck coordinate space. These coordinates can be specified either as a standard python <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code> of three floats, or as an instance of the <code class="xref py py-class docutils literal"><span class="pre">collections.namedtuple</span></code> <a class="reference internal" href="#opentrons.types.Point" title="opentrons.types.Point"><code class="xref py py-class docutils literal"><span class="pre">opentrons.types.Point</span></code></a>, which can be created in the same way.</p>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labware.html">Labware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipettes.html">Creating a Pipette</a></li>
+<li class="toctree-l1"><a class="reference internal" href="atomic commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/new_protocol_api.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+  <div class="wrapper">
+
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
+        </form>
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+
+    </section>
+
+  </div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+ });
+</script>
+
+
+ 
+  </body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Creating a Pipette &#8212; Opentrons API v2.0</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/nav.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/override_master.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Opentrons API v2.0" href="index.html" />
+    <link rel="next" title="Atomic Liquid Handling" href="atomic commands.html" />
+    <link rel="prev" title="Labware" href="labware.html" />
+ 
+<link rel="stylesheet" href="_static/custom.css" type="text/css" />  
+<meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+<script src="_static/Akko-Pro-All.js"></script>
+<!-- INTERCOM -->
+<script>
+window.intercomSettings = {
+  app_id: 'ukpodv2l'
+};
+</script>
+<script>
+(function () {
+  var w = window;
+  var ic = w.Intercom;
+  if (typeof ic === "function") {
+    ic('reattach_activator');
+    ic('update', intercomSettings);
+  } else {
+    var d = document;
+    var i = function() {
+      i.c(arguments)
+    };
+    i.q = [];
+    i.c = function(args) {
+      i.q.push(args)
+    };
+    w.Intercom = i;
+
+    function l () {
+      var s = d.createElement('script');
+      s.type = 'text/javascript';
+      s.async = true;
+      s.src = 'https://widget.intercom.io/widget/ukpodv2l';
+      var x = d.getElementsByTagName('script')[0];
+      x.parentNode.insertBefore(s, x);
+    }
+    if (w.attachEvent) {
+        w.attachEvent('onload', l);
+    } else {
+        w.addEventListener('load', l, false);
+    }
+  }
+})()
+</script>
+<script>
+  function toggleNav () {
+    document.getElementById('main-menu').classList.toggle('open');
+  }
+</script>
+
+  </head>
+  <body role="document">
+
+<header id="nav">
+  <nav class="main-menu" id="main-menu" class="">
+    <a href="#" class="brand"><img class="top-nav-logo" src="https://s3.amazonaws.com/opentrons-images/website/ot_logo_full.png" alt="OpenTrons Logo Home" />
+    </a>
+
+    <div id="nav-collapse" onclick="toggleNav()">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </div>
+
+    <ul >
+      <li>
+        <a href="#" class="top-level">
+         Products
+        </a>
+        <ul>
+          <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+          <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+          <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+          <li><a href="https://opentrons.com/modules" >Modules</a></li>
+          <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+          <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+        </ul>
+
+      </li>
+      <li>
+        <a href="#">
+          Company
+        </a>
+        <ul>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">We're Hiring</a></li>
+          <li><a href="https://opentrons.com/about" >About</a></li>
+          <li><a href="https://opentrons.com/team" >Team</a></li>
+          <li><a href="https://blog.opentrons.com/">Blog</a></li>
+          <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          Resources
+        </a>
+        <ul>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="https://shop.opentrons.com/" class="buy">
+          Buy
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>   
+
+    <div class="document">
+    <div class="documentwrapper">
+        <div class="bodywrapper">
+            <div class="body" role="main">
+                
+  <p id="pipettes">The <code class="docutils literal"><span class="pre">instruments</span></code> module gives your protocol access to the pipette constructors, which is what you will be primarily using to create protocol commands.</p>
+<hr class="docutils" />
+<div class="section" id="creating-a-pipette">
+<h1>Creating a Pipette<a class="headerlink" href="#creating-a-pipette" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Examples in this section require the following:</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="kn">from</span> <span class="nn">opentrons</span> <span class="kn">import</span> <span class="n">instruments</span><span class="p">,</span> <span class="n">robot</span>
+</pre></div>
+</div>
+<div class="section" id="pipette-model-s">
+<h2>Pipette Model(s)<a class="headerlink" href="#pipette-model-s" title="Permalink to this headline">¶</a></h2>
+<p>Currently in our API there are 7 pipette models to correspond with the offered pipette models on our website.</p>
+<p>They are as follows:
+<code class="docutils literal"><span class="pre">P10_Single</span></code> (1 - 10 ul)
+<code class="docutils literal"><span class="pre">P10_Multi</span></code> (1 - 10ul)
+<code class="docutils literal"><span class="pre">P50_Single</span></code> (5 - 50ul)
+<code class="docutils literal"><span class="pre">P50_Multi</span></code> (5 - 50ul)
+<code class="docutils literal"><span class="pre">P300_Single</span></code> (30 - 300ul)
+<code class="docutils literal"><span class="pre">P300_Mutli</span></code> (30 - 300ul)
+<code class="docutils literal"><span class="pre">P1000_Single</span></code> (100 - 1000ul)</p>
+<p>For every pipette type you are using in a protocol, you must use one of the
+model names specified above and call it out as <code class="docutils literal"><span class="pre">instruments</span></code>.(Model Name)</p>
+</div>
+<div class="section" id="mount">
+<h2>Mount<a class="headerlink" href="#mount" title="Permalink to this headline">¶</a></h2>
+<p>To create a pipette object, you must give it a mount. The mount can be either <code class="docutils literal"><span class="pre">'left'</span></code> or <code class="docutils literal"><span class="pre">'right'</span></code>.
+In this example, we are using a Single-Channel 300uL pipette.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span><span class="n">mount</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plunger-flow-rates">
+<h2>Plunger Flow Rates<a class="headerlink" href="#plunger-flow-rates" title="Permalink to this headline">¶</a></h2>
+<p>The speeds at which the pipette will aspirate and dispense can be set through <code class="docutils literal"><span class="pre">aspirate_speed</span></code> and <code class="docutils literal"><span class="pre">dispense_speed</span></code>.
+The values are in microliters/seconds, and have varying defaults depending on the model.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P300_Single</span><span class="p">(</span>
+    <span class="n">mount</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+    <span class="n">aspirate_flow_rate</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">dispense_flow_rate</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="minimum-and-maximum-volume">
+<h2>Minimum and Maximum Volume<a class="headerlink" href="#minimum-and-maximum-volume" title="Permalink to this headline">¶</a></h2>
+<p>The minimum and maximum volume of the pipette may be set using
+<code class="docutils literal"><span class="pre">min_volume</span></code> and <code class="docutils literal"><span class="pre">max_volume</span></code>. The values are in microliters and have
+varying defaults depending on the model.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">pipette</span> <span class="o">=</span> <span class="n">instruments</span><span class="o">.</span><span class="n">P10_Single</span><span class="p">(</span>
+    <span class="n">mount</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">,</span>
+    <span class="n">min_volume</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">max_volume</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The given defaults for every pipette model is the following:</p>
+</div>
+<div class="section" id="p10-single">
+<h2>P10_Single<a class="headerlink" href="#p10-single" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 5 μl/s</li>
+<li>Dispense Default: 10 μl/s</li>
+<li>Minimum Volume: 1 μl</li>
+<li>Maximum Volume: 10 μl</li>
+</ul>
+</div>
+<div class="section" id="p10-multi">
+<h2>P10_Multi<a class="headerlink" href="#p10-multi" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 5 μl/s</li>
+<li>Dispense Default: 10 μl/s</li>
+<li>Minimum Volume: 1 μl</li>
+<li>Maximum Volume: 10 μl</li>
+</ul>
+</div>
+<div class="section" id="p50-single">
+<h2>P50_Single<a class="headerlink" href="#p50-single" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 25 μl/s</li>
+<li>Dispense Default: 50 μl/s</li>
+<li>Minimum Volume: 5 μl</li>
+<li>Maximum Volume: 50 μl</li>
+</ul>
+</div>
+<div class="section" id="p50-multi">
+<h2>P50_Multi<a class="headerlink" href="#p50-multi" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 25 μl/s</li>
+<li>Dispense Default: 50 μl/s</li>
+<li>Minimum Volume: 5 μl</li>
+<li>Maximum Volume: 50 μl</li>
+</ul>
+</div>
+<div class="section" id="p300-single">
+<h2>P300_Single<a class="headerlink" href="#p300-single" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 150 μl/s</li>
+<li>Dispense Default: 300 μl/s</li>
+<li>Minimum Volume: 30 μl</li>
+<li>Maximum Volume: 300 μl</li>
+</ul>
+</div>
+<div class="section" id="p300-multi">
+<h2>P300_Multi<a class="headerlink" href="#p300-multi" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 150 μl/s</li>
+<li>Dispense Default: 300 μl/s</li>
+<li>Minimum Volume: 30 μl</li>
+<li>Maximum Volume: 300 μl</li>
+</ul>
+</div>
+<div class="section" id="p1000-single">
+<h2>P1000_Single<a class="headerlink" href="#p1000-single" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Aspirate Default: 500 μl/s</li>
+<li>Dispense Default: 1000 μl/s</li>
+<li>Minimum Volume: 100 μl</li>
+<li>Maximum Volume: 1000 μl</li>
+</ul>
+</div>
+<div class="section" id="old-pipette-constructor">
+<h2>Old Pipette Constructor<a class="headerlink" href="#old-pipette-constructor" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal"><span class="pre">Pipette</span></code> constructor that was used directly in OT-One protocols is now
+an internal-only class. Its behavior is difficult to predict when not used
+through the public constructors mentioned above. <code class="docutils literal"><span class="pre">Pipette</span></code> constructor
+arguments are subject to change of their default values, behaviors, and
+parameters may be added or removed without warning or a major version
+increment.</p>
+</div>
+</div>
+
+
+            </div>
+        </div>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/logo.png" alt="Logo"/>
+            </a></p>
+<h3><a href="index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="writing.html">Design with Python</a></li>
+<li class="toctree-l1"><a class="reference internal" href="labware.html">Labware</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating a Pipette</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pipette-model-s">Pipette Model(s)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mount">Mount</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#plunger-flow-rates">Plunger Flow Rates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimum-and-maximum-volume">Minimum and Maximum Volume</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p10-single">P10_Single</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p10-multi">P10_Multi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p50-single">P50_Single</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p50-multi">P50_Multi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p300-single">P300_Single</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p300-multi">P300_Multi</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#p1000-single">P1000_Single</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#old-pipette-constructor">Old Pipette Constructor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="atomic commands.html">Atomic Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="complex commands.html">Complex Liquid Handling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="robot.html">Advanced Control</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Hardware Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="labware.html" title="previous chapter">Labware</a></li>
+      <li>Next: <a href="atomic commands.html" title="next chapter">Atomic Liquid Handling</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pipettes.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer>
+  <div class="wrapper">
+
+    <section class="social-signup">
+      <div class="social-links">
+        <a href="https://www.facebook.com/OpenTrons-Labworks/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Facebook"
+        ><img src="https://s3.amazonaws.com/opentrons-images/website/logo_facebook.png" alt="facebook logo"/></a>
+        <a href="https://twitter.com/OpenTrons_" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Twitter"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_twitter.png" alt="twitter logo" /></a>
+        <a href="https://www.instagram.com/opentronslab/" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Instagram"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_instagram.png" alt="instagram logo" /></a>
+        <a href="https://www.youtube.com/channel/UCvMRmXIxnHs3AutkVhuqaQg" target="_blank"
+        ga-on="click"
+        ga-event-category="Social"
+        ga-event-action="Open Youtube"><img src="https://s3.amazonaws.com/opentrons-images/website/logo_youtube.png" alt="youtube logo" /></a>
+      </div>
+      <h3>Sign Up For Our Newsletter</h3>
+      <div id="mc_embed_signup">
+        <form action="//opentrons.us8.list-manage.com/subscribe/post?u=000595683fb96c5fb3c54cf53&amp;id=ba66060a9c" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+          <div id="mc_embed_signup_scroll">
+            <input type="email" value="" name="EMAIL" class="email-newsletter" id="mce-EMAIL" placeholder="email address" required
+            ga-on="input"
+            ga-event-category="Mailchimp"
+            ga-event-action="Enter Email"
+            >
+            <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_000595683fb96c5fb3c54cf53_ba66060a9c" tabindex="-1" value=""></div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="gray subscribe"
+            ga-on="click"
+            ga-event-category="Mailchimp"
+            ga-event-action="Newsletter Signup">
+          </div>
+        </form>
+      </div>
+      <p class="copyrite">&#169;&nbsp;OPENTRONS 2017</p>
+    </section>
+    <section class="footer-menu">
+      <ul>
+        <li>Products</li>
+        <li><a href="https://opentrons.com/robots" >OT-One</a></li>
+        <li><a href="https://opentrons.com/ot-2" >OT-2</a></li>
+        <li><a href="https://opentrons.com/pipettes" >OT-2 Pipettes</a></li>
+        <li><a href="https://opentrons.com/modules" >Modules</a></li>
+        <li><a href="https://opentrons.com/ot-app" >OT App</a></li>
+        <li><a href="https://protocols.opentrons.com/" target="_blank">Protocol Library</a></li>
+      </ul>
+      <ul>
+        <li>Company</li>
+        <li><a href="https://opentrons.com/about" >About</a></li>
+        <li><a href="https://opentrons.com/team" >Team</a></li>
+        <li><a href="https://blog.opentrons.com/">Blog</a></li>
+        <li><a href="https://opentrons.com/contact" >Contact Us</a></li>
+        <li><a href="https://opentrons.com/jobs" target="_blank" class="hiring">WE'RE HIRING</a></li>
+      </ul>
+      <ul>
+        <li>Resources</li>
+        <li><a href="https://support.opentrons.com" target="_blank">Support</a></li>
+          <li><a href="http://docs.opentrons.com/" target="_blank">Opentrons API</a></li>
+          <li><a href="https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md" target="_blank">Open Source</a></li>
+      </ul>
+      <ul>
+        <li><a href="https://shop.opentrons.com/" class="buy">Buy</a></li>
+      </ul>
+
+    </section>
+
+  </div>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-83820700-1', 'auto');
+ga('send', 'pageview');
+ });
+</script>
+
+
+ 
+  </body>
+</html>
